@@ -30,7 +30,7 @@ This is the **initial prototype** for an AI bank incubation project focused on:
    - Loading animation with gradient branding
 
 2. **Two-Area Layout Structure**:
-   - **Top Area (25% height)**: Customer details section that evolves through journey stages
+   - **Top Area (25% height)**: Session context with AI dialog and customer journey evolution
    - **Bottom Area (75% height)**: Working window for banking operations
 
 3. **Customer Journey Stages**:
@@ -38,6 +38,11 @@ This is the **initial prototype** for an AI bank incubation project focused on:
    - `identifying` → Customer identification process
    - `verifying` → AI-powered identity verification
    - `verified` → Personalized banking dashboard
+
+4. **AI Dialog Integration**:
+   - **AI Assistant Panel**: Animated bubble panel with conversational interface
+   - **Dynamic messaging**: AI speaks directly to users with contextual guidance
+   - **Visual indicators**: Online status, typing animations, and processing states
 
 ### ✅ **Design Philosophy**
 
@@ -59,10 +64,13 @@ This is the **initial prototype** for an AI bank incubation project focused on:
 
 - [x] Project foundation with full tech stack
 - [x] Splash screen with 3-second timer and animations
-- [x] Progressive layout with customer details and working areas
+- [x] Progressive layout with session context and working areas
 - [x] Redux store with customer journey state management
 - [x] Material-UI theme with banking-appropriate styling
 - [x] Component architecture ready for expansion
+- [x] **AI Dialog System**: Conversational bubble panel with dynamic messaging
+- [x] **Animation Framework**: Smooth transitions and grow-in effects
+- [x] **Component Modularity**: Separated AI panel from container for reusability
 - [x] Development environment setup
 
 ### **Next Development Phases**
@@ -114,9 +122,14 @@ App (Redux Provider + MUI Theme)
 └── MainLayout
     ├── SplashScreen (3-second timer)
     └── Main Content (fade-in after splash)
-        ├── CustomerDetailsArea (25% height)
-        │   ├── Stage-based titles and descriptions
-        │   └── AI Security status indicator
+        ├── SessionContextContainer (25% height)
+        │   ├── CustomerDetailsPanel (Left - 1/3 width)
+        │   │   ├── AI Avatar & Online Status
+        │   │   ├── Dynamic dialog messages by stage
+        │   │   └── Typing indicator during processing
+        │   └── Main Content Area (Right - 2/3 width)
+        │       ├── Stage-based titles and descriptions
+        │       └── AI Security status indicator
         └── WorkingWindowArea (75% height)
             └── BankWallpaper (initial state)
                 └── [Future: Banking operations]
@@ -158,7 +171,8 @@ src/
 ├── components/
 │   ├── common/           # Reusable UI components
 │   │   ├── SplashScreen.jsx
-│   │   ├── CustomerDetailsArea.jsx
+│   │   ├── SessionContextContainer.jsx
+│   │   ├── CustomerDetailsPanel.jsx
 │   │   ├── WorkingWindowArea.jsx
 │   │   └── BankWallpaper.jsx
 │   └── layout/           # Layout components
@@ -220,16 +234,17 @@ src/
 
 ### **Current State**
 
-The application successfully demonstrates the **progressive customer journey concept** with a clean, professional interface that can serve as the foundation for a production banking application.
+The application successfully demonstrates the **progressive customer journey concept** with a clean, professional interface that can serve as the foundation for a production banking application. The **AI dialog system** creates an engaging, conversational experience that guides users through their banking journey with personalized messaging and visual feedback.
 
 ### **Ready for Next Steps**
 
 The architecture is prepared for:
 
 - Adding forms to the working window area
-- Implementing customer data collection
-- Building AI verification workflows
+- Implementing customer data collection through AI-guided conversations
+- Building AI verification workflows with real-time feedback
 - Expanding the Redux state for banking operations
+- Enhancing the AI dialog system with more interactive features
 
 ### **Code Quality Standards**
 
@@ -244,4 +259,4 @@ The architecture is prepared for:
 
 This project represents the initial foundation for an AI-driven banking platform. The current implementation successfully fulfills all initial requirements and provides a solid base for continued development of advanced banking features and AI integrations.
 
-**Status**: ✅ Foundation Complete - Ready for Feature Development
+**Status**: ✅ Foundation Complete + AI Dialog System - Ready for Interactive Features
