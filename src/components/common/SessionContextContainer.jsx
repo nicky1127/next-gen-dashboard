@@ -37,10 +37,10 @@ const SessionContextContainer = () => {
             position: 'relative',
           }}
         >
-          {/* IvrContextPanel - Far Left Side (flexible width) */}
+          {/* IvrContextPanel - Fixed width */}
           <Box
             sx={{
-              flex: '0 0 auto', // Don't grow or shrink, size to content
+              flex: '0 0 320px', // Fixed 320px width
               display: 'flex',
               alignItems: 'stretch', // Full height alignment
               minWidth: 0, // Allow shrinking without breaking layout
@@ -49,10 +49,10 @@ const SessionContextContainer = () => {
             <IvrContextPanel />
           </Box>
 
-          {/* CustomerDetailsPanel - Left Side (flexible width) */}
+          {/* CustomerDetailsPanel - Fixed width */}
           <Box
             sx={{
-              flex: '0 0 auto', // Don't grow or shrink, size to content
+              flex: '0 0 480px', // Fixed 480px width
               display: 'flex',
               alignItems: 'stretch', // Full height alignment
               minWidth: 0, // Allow shrinking without breaking layout
@@ -61,10 +61,10 @@ const SessionContextContainer = () => {
             <CustomerDetailsPanel />
           </Box>
 
-          {/* SupportNeedsPanel - Next to CustomerDetailsPanel */}
+          {/* SupportNeedsPanel - Fixed width */}
           <Box
             sx={{
-              flex: '0 0 auto', // Don't grow or shrink, size to content
+              flex: '0 0 200px', // Fixed 200px width
               display: 'flex',
               alignItems: 'stretch', // Full height alignment
               minWidth: 0, // Allow shrinking without breaking layout
@@ -73,12 +73,13 @@ const SessionContextContainer = () => {
             <SupportNeedsPanel />
           </Box>
 
-          {/* Main Content Area - Right Side (remaining width) */}
+          {/* Main Content Area - Takes remaining space */}
           <Box
             sx={{
-              flex: '1',
+              flex: '1', // Takes all remaining space
               display: 'flex',
               alignItems: 'center',
+              minWidth: '400px', // Minimum width to ensure it's substantial
             }}
           >
             <MainContentPanel />

@@ -47,7 +47,18 @@ const CustomerDetailsPanel = () => {
     return details;
   };
 
+  const getCustomerAddress = () => {
+    return [
+      '910 Upper Way',
+      'Eccleshill',
+      'Eaglescliffe',
+      'Birkenshaw',
+      'M19 0HD',
+    ];
+  };
+
   const customerDetails = getCustomerDetails();
+  const customerAddress = getCustomerAddress();
 
   // Get the main message
   const getMainMessage = () => {
@@ -107,6 +118,7 @@ const CustomerDetailsPanel = () => {
           height: showFinalView ? '100%' : 'auto', // 100% height in final view
           minHeight: showFinalView ? 'unset' : '120px', // Remove minHeight in final view
           width: '100%', // Take full width of container
+          minWidth: '480px', // Wider to accommodate two sections
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-start',
@@ -232,11 +244,69 @@ const CustomerDetailsPanel = () => {
           <Box
             sx={{
               flex: 1,
+              display: 'flex',
+              gap: 3, // Space between sections
             }}
           >
-            {customerDetails.map((detail, index) => (
+            {/* Left Section - Personal Details */}
+            <Box sx={{ flex: 1 }}>
+              {customerDetails.map((detail, index) => (
+                <Typography
+                  key={index}
+                  variant="caption"
+                  sx={{
+                    display: 'block',
+                    color: 'text.secondary',
+                    fontSize: '0.75rem',
+                    lineHeight: 1.6,
+                    mb: 0.8,
+                    fontFamily: 'monospace',
+                    opacity: 0,
+                    wordWrap: 'break-word',
+                    overflowWrap: 'break-word',
+                    hyphens: 'auto',
+                    animation: `slideIn 0.4s ease-out ${index * 0.4}s forwards`,
+                    '@keyframes slideIn': {
+                      from: {
+                        opacity: 0,
+                        transform: 'translateX(-10px)',
+                      },
+                      to: {
+                        opacity: 1,
+                        transform: 'translateX(0)',
+                      },
+                    },
+                  }}
+                >
+                  • {detail}
+                </Typography>
+              ))}
+            </Box>
+
+            {/* Vertical Divider */}
+            <Box
+              sx={{
+                width: '1px',
+                backgroundColor: 'rgba(17, 182, 122, 0.2)',
+                mx: 1,
+                opacity: 0,
+                animation: 'dividerFadeIn 0.5s ease-out 1s forwards',
+                '@keyframes dividerFadeIn': {
+                  from: {
+                    opacity: 0,
+                    height: '0%',
+                  },
+                  to: {
+                    opacity: 1,
+                    height: '100%',
+                  },
+                },
+              }}
+            />
+
+            {/* Right Section - Address */}
+            <Box sx={{ flex: 1 }}>
               <Typography
-                key={index}
                 variant="caption"
                 sx={{
                   display: 'block',
@@ -245,15 +315,13 @@ const CustomerDetailsPanel = () => {
                   lineHeight: 1.6,
                   mb: 0.8,
                   fontFamily: 'monospace',
+                  fontWeight: 600,
                   opacity: 0,
-                  wordWrap: 'break-word', // Allow line breaks for long words
-                  overflowWrap: 'break-word', // Alternative for better support
-                  hyphens: 'auto', // Add hyphens for better line breaks
-                  animation: `slideIn 0.4s ease-out ${index * 0.4}s forwards`,
+                  animation: 'slideIn 0.4s ease-out 2.4s forwards', // Start after left section
                   '@keyframes slideIn': {
                     from: {
                       opacity: 0,
-                      transform: 'translateX(-10px)',
+                      transform: 'translateX(10px)',
                     },
                     to: {
                       opacity: 1,
@@ -262,9 +330,40 @@ const CustomerDetailsPanel = () => {
                   },
                 }}
               >
-                • {detail}
+                Address:
               </Typography>
-            ))}
+              {customerAddress.map((line, index) => (
+                <Typography
+                  key={index}
+                  variant="caption"
+                  sx={{
+                    display: 'block',
+                    color: 'text.secondary',
+                    fontSize: '0.75rem',
+                    lineHeight: 1.6,
+                    mb: 0.4,
+                    fontFamily: 'monospace',
+                    opacity: 0,
+                    wordWrap: 'break-word',
+                    overflowWrap: 'break-word',
+                    hyphens: 'auto',
+                    animation: `slideIn 0.4s ease-out ${2.8 + index * 0.2}s forwards`, // Staggered after "Address:"
+                    '@keyframes slideIn': {
+                      from: {
+                        opacity: 0,
+                        transform: 'translateX(10px)',
+                      },
+                      to: {
+                        opacity: 1,
+                        transform: 'translateX(0)',
+                      },
+                    },
+                  }}
+                >
+                  {line}
+                </Typography>
+              ))}
+            </Box>
           </Box>
         )}
 
