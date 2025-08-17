@@ -1,6 +1,7 @@
 // File: src/components/common/SessionContextContainer.jsx
 import React from 'react';
 import { Box, Container, Paper } from '@mui/material';
+import IvrContextPanel from './IvrContextPanel';
 import CustomerDetailsPanel from './CustomerDetailsPanel';
 import MainContentPanel from './MainContentPanel';
 import SupportNeedsPanel from './SupportNeedsPanel';
@@ -18,7 +19,9 @@ const SessionContextContainer = () => {
         boxShadow: 'none',
         position: 'relative',
         overflow: 'hidden',
-        p: '10px', // 10px padding on all sides
+        pt: '20px', // Increased top padding for logo tag clearance
+        px: '10px', // Left and right padding
+        pb: '10px', // Bottom padding
       }}
     >
       <Container
@@ -34,6 +37,18 @@ const SessionContextContainer = () => {
             position: 'relative',
           }}
         >
+          {/* IvrContextPanel - Far Left Side (flexible width) */}
+          <Box
+            sx={{
+              flex: '0 0 auto', // Don't grow or shrink, size to content
+              display: 'flex',
+              alignItems: 'stretch', // Full height alignment
+              minWidth: 0, // Allow shrinking without breaking layout
+            }}
+          >
+            <IvrContextPanel />
+          </Box>
+
           {/* CustomerDetailsPanel - Left Side (flexible width) */}
           <Box
             sx={{

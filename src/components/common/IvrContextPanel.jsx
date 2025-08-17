@@ -1,4 +1,4 @@
-// File: src/components/common/SupportNeedsPanel.jsx
+// File: src/components/common/IvrContextPanel.jsx
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Box, Typography, Grow } from '@mui/material';
@@ -6,47 +6,59 @@ import useTypingAnimation from '../../hooks/useTypingAnimation';
 import TypingIndicator from './TypingIndicator';
 import AiAssistantTag from './AiAssistantTag';
 
-const SupportNeedsPanel = () => {
+const IvrContextPanel = () => {
   const { stage, data } = useSelector((state) => state.customer);
   const { splashVisible } = useSelector((state) => state.app);
   const [showPanel, setShowPanel] = useState(false);
   const [showTyping, setShowTyping] = useState(false);
-  const [showSupportDetails, setShowSupportDetails] = useState(false);
+  const [showIvrDetails, setShowIvrDetails] = useState(false);
   const [showFinalView, setShowFinalView] = useState(false);
 
-  // Watch for CustomerDetailsPanel to reach final view
-  // This is a simplified approach - in a real app you'd use a shared state or context
+  // Trigger panel animation after splash screen fades
   useEffect(() => {
     if (!splashVisible) {
-      // Start SupportNeedsPanel after CustomerDetailsPanel animations complete
-      // IvrContextPanel: 4.5s total → CustomerDetailsPanel: 4.5s + 2s = 6.5s total
-      // Start SupportNeedsPanel after CustomerDetailsPanel completes
       const timer = setTimeout(() => {
         setShowPanel(true);
         // Start typing animation after panel appears
         setTimeout(() => setShowTyping(true), 500);
-      }, 7000); // Start when customer details should be in final view
+      }, 500);
 
       return () => clearTimeout(timer);
     }
   }, [splashVisible]);
 
-  const getSupportDetails = () => {
-    // Support needs data
+  // Reset typing animation when stage changes
+  useEffect(() => {
+    if (showPanel) {
+      setShowTyping(false);
+      setShowFinalView(false);
+      const timer = setTimeout(() => setShowTyping(true), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [stage, showPanel]);
+
+  const getIvrDetails = () => {
+    // IVR context data
     const details = [];
 
-    details.push(`018 - Check address`);
-    details.push(`021 - Polish Speaking`);
-    details.push(`026 - Do not teleport`);
+    details.push(`Wait Time: 00:00:05`);
+    details.push(`Call Reason: Change of Address`);
+    details.push(`Utterance: I'm calling to update my address`);
+    details.push(
+      `B/O Reason: INFO-Cust doesn't have their account number with them`
+    );
+    details.push(`Breakout Time: 18:45:56`);
+    details.push(`Call Number: 07544129854`);
+    details.push(`VDN: 1116158`);
 
     return details;
   };
 
-  const supportDetails = getSupportDetails();
+  const ivrDetails = getIvrDetails();
 
   // Get the main message
   const getMainMessage = () => {
-    return 'Here is the support needs indicators in association with the customer...';
+    return "Hello! I'm here to guide you through the customer journey. Here are the IVR details:";
   };
 
   const mainMessage = getMainMessage();
@@ -60,30 +72,20 @@ const SupportNeedsPanel = () => {
       showTyping
     );
 
-  // Reset typing animation when stage changes
-  useEffect(() => {
-    if (showPanel) {
-      setShowTyping(false);
-      setShowFinalView(false);
-      const timer = setTimeout(() => setShowTyping(true), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [stage, showPanel]);
-
-  // Show support details only after typing animation completes
+  // Show IVR details only after typing animation completes
   useEffect(() => {
     if (!isTypingMessage && showTyping) {
       // Small delay to ensure smooth transition
       const timer = setTimeout(() => {
-        setShowSupportDetails(true);
-        // Switch to final view after support details appear
+        setShowIvrDetails(true);
+        // Switch to final view after IVR details appear
         setTimeout(() => setShowFinalView(true), 1000);
       }, 800);
 
       return () => clearTimeout(timer);
     } else if (isTypingMessage) {
-      // Hide support details when typing starts (for stage changes)
-      setShowSupportDetails(false);
+      // Hide IVR details when typing starts (for stage changes)
+      setShowIvrDetails(false);
       setShowFinalView(false);
     }
   }, [isTypingMessage, showTyping]);
@@ -102,6 +104,7 @@ const SupportNeedsPanel = () => {
           height: showFinalView ? '100%' : 'auto', // 100% height in final view
           minHeight: showFinalView ? 'unset' : '120px', // Remove minHeight in final view
           width: '100%', // Take full width of container
+          minWidth: '320px', // Ensure minimum width for content
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-start',
@@ -126,8 +129,102 @@ const SupportNeedsPanel = () => {
           },
         }}
       >
+        {/* Top Border with Title - Show only when AI tag disappears */}
+        {showIvrDetails && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '32px',
+              background: 'linear-gradient(135deg, #11b67a 0%, #0c8a5a 100%)',
+              borderRadius: '24px 24px 0 0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 5,
+              opacity: 0,
+              animation: 'borderSlideIn 0.5s ease-out 0.3s forwards',
+              '@keyframes borderSlideIn': {
+                from: {
+                  opacity: 0,
+                  transform: 'translateY(-10px)',
+                },
+                to: {
+                  opacity: 1,
+                  transform: 'translateY(0)',
+                },
+              },
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'white',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase',
+              }}
+            >
+              IVR Context
+            </Typography>
+          </Box>
+        )}
+        {/* Brand Logo Tag - Top Left Corner (Slightly bigger and more inward) */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: -8,
+            left: -8,
+            width: 40,
+            height: 40,
+            borderRadius: '50%',
+            backgroundColor: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow:
+              '0 3px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04)',
+            border: '1.5px solid rgba(17, 182, 122, 0.1)',
+            zIndex: 10,
+            opacity: 0,
+            transform: 'scale(0.8)',
+            animation: showPanel
+              ? 'logoTagAppear 0.8s ease-out 0.5s forwards'
+              : 'none',
+            '@keyframes logoTagAppear': {
+              from: {
+                opacity: 0,
+                transform: 'scale(0.8) rotate(-10deg)',
+              },
+              to: {
+                opacity: 1,
+                transform: 'scale(1) rotate(0deg)',
+              },
+            },
+            '&:hover': {
+              transform: 'scale(1.05)',
+              boxShadow:
+                '0 4px 16px rgba(17, 182, 122, 0.15), 0 2px 4px rgba(0,0,0,0.08)',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            },
+          }}
+        >
+          <Box
+            component="img"
+            src={`${process.env.PUBLIC_URL}/assets/neobank-trademark.svg`}
+            alt="NeoBank"
+            sx={{
+              width: 30,
+              height: 30,
+              transition: 'all 0.3s ease',
+            }}
+          />
+        </Box>
         {/* AI Avatar and Name - Using reusable component with auto-hide */}
-        {!showSupportDetails && (
+        {!showIvrDetails && (
           <AiAssistantTag
             isTyping={isTypingMessage}
             size="medium"
@@ -137,7 +234,7 @@ const SupportNeedsPanel = () => {
         )}
 
         {/* AI Message with Typing Animation - Hide after typing completes but maintain space */}
-        {!showSupportDetails && (
+        {!showIvrDetails && (
           <Box
             sx={{
               minHeight: '3.6em', // Always maintain the space for message
@@ -178,58 +275,14 @@ const SupportNeedsPanel = () => {
           </Box>
         )}
 
-        {/* Top Border with Title - Show only when AI tag disappears */}
-        {showSupportDetails && (
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: '32px',
-              background: 'linear-gradient(135deg, #11b67a 0%, #0c8a5a 100%)',
-              borderRadius: '24px 24px 0 0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 5,
-              opacity: 0,
-              animation: 'borderSlideIn 0.5s ease-out 0.3s forwards',
-              '@keyframes borderSlideIn': {
-                from: {
-                  opacity: 0,
-                  transform: 'translateY(-10px)',
-                },
-                to: {
-                  opacity: 1,
-                  transform: 'translateY(0)',
-                },
-              },
-            }}
-          >
-            <Typography
-              variant="caption"
-              sx={{
-                color: 'white',
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                letterSpacing: '0.5px',
-                textTransform: 'uppercase',
-              }}
-            >
-              Support Needs
-            </Typography>
-          </Box>
-        )}
-
-        {/* Support Details Section - Show only after typing completely finishes */}
-        {showSupportDetails && (
+        {/* IVR Details Section - Show only after typing completely finishes */}
+        {showIvrDetails && (
           <Box
             sx={{
               flex: 1,
             }}
           >
-            {supportDetails.map((detail, index) => (
+            {ivrDetails.map((detail, index) => (
               <Typography
                 key={index}
                 variant="caption"
@@ -266,11 +319,11 @@ const SupportNeedsPanel = () => {
         {/* Typing indicator for verification stage */}
         <TypingIndicator
           show={stage === 'verifying'}
-          message="AI is processing support request..."
+          message="AI is processing IVR context..."
           size="small"
         />
 
-        {/* Support completion indicator */}
+        {/* IVR completion indicator */}
         {stage === 'verified' && !isTypingMessage && (
           <Box
             sx={{
@@ -311,7 +364,7 @@ const SupportNeedsPanel = () => {
                 fontWeight: 500,
               }}
             >
-              Support request processed successfully
+              IVR context captured successfully
             </Typography>
           </Box>
         )}
@@ -320,4 +373,4 @@ const SupportNeedsPanel = () => {
   );
 };
 
-export default SupportNeedsPanel;
+export default IvrContextPanel;

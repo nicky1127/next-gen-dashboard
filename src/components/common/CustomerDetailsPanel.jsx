@@ -14,34 +14,24 @@ const CustomerDetailsPanel = () => {
   const [showCustomerDetails, setShowCustomerDetails] = useState(false);
   const [showFinalView, setShowFinalView] = useState(false);
 
-  // Trigger panel animation after splash screen fades
+  // Start CustomerDetailsPanel after IvrContextPanel completes
   useEffect(() => {
     if (!splashVisible) {
       const timer = setTimeout(() => {
         setShowPanel(true);
         // Start typing animation after panel appears
         setTimeout(() => setShowTyping(true), 500);
-      }, 500);
+      }, 4500); // Start when IVR details should be in final view
 
       return () => clearTimeout(timer);
     }
   }, [splashVisible]);
-
-  // Reset typing animation when stage changes
-  useEffect(() => {
-    if (showPanel) {
-      setShowTyping(false);
-      const timer = setTimeout(() => setShowTyping(true), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [stage, showPanel]);
 
   const getCustomerDetails = () => {
     // Use sample data when no real data is available, or mix with real data
     const sampleData = {
       name: data.name || 'Chris Smith',
       dateOfBirth: '14/02/1978 (47)',
-      phone: data.phone || '+44 7700 900123',
       verified: data.verified !== undefined ? data.verified : false,
     };
 
@@ -49,7 +39,9 @@ const CustomerDetailsPanel = () => {
 
     details.push(`Name: ${sampleData.name}`);
     details.push(`DoB: ${sampleData.dateOfBirth}`);
-    details.push(`Phone: ${sampleData.phone}`);
+    details.push(`Home: 07845132587`);
+    details.push(`Mobile: 07412459865`);
+    details.push(`Work: 07614578945`);
     details.push(`Verified: ${sampleData.verified ? 'Yes' : 'Pending'}`);
 
     return details;
@@ -57,11 +49,9 @@ const CustomerDetailsPanel = () => {
 
   const customerDetails = getCustomerDetails();
 
-  // Get the main message based on stage and data
+  // Get the main message
   const getMainMessage = () => {
-    const baseMessage =
-      "Hello! I'm here to guide you through the customer journey.";
-    return `${baseMessage} Here are the details about the customer:`;
+    return "Hello! I'm here to guide you through the customer journey. Here are the details about the customer:";
   };
 
   const mainMessage = getMainMessage();
@@ -75,18 +65,31 @@ const CustomerDetailsPanel = () => {
       showTyping
     );
 
+  // Reset typing animation when stage changes
+  useEffect(() => {
+    if (showPanel) {
+      setShowTyping(false);
+      setShowFinalView(false);
+      const timer = setTimeout(() => setShowTyping(true), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [stage, showPanel]);
+
   // Show customer details only after typing animation completes
   useEffect(() => {
     if (!isTypingMessage && showTyping) {
-      // Longer delay to create a gap between hello message and customer details
+      // Small delay to ensure smooth transition
       const timer = setTimeout(() => {
         setShowCustomerDetails(true);
-      }, 800); // Increased from 200ms to 800ms
+        // Switch to final view after customer details appear
+        setTimeout(() => setShowFinalView(true), 1000);
+      }, 800);
 
       return () => clearTimeout(timer);
     } else if (isTypingMessage) {
       // Hide customer details when typing starts (for stage changes)
       setShowCustomerDetails(false);
+      setShowFinalView(false);
     }
   }, [isTypingMessage, showTyping]);
 
@@ -100,9 +103,10 @@ const CustomerDetailsPanel = () => {
           border: '1px solid rgba(255,255,255,0.2)',
           borderRadius: '24px',
           padding: 3,
+          paddingTop: 5, // Extra padding for the top border text
           height: showFinalView ? '100%' : 'auto', // 100% height in final view
           minHeight: showFinalView ? 'unset' : '120px', // Remove minHeight in final view
-          width: '100%', // Take full width of container (max 20%)
+          width: '100%', // Take full width of container
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-start',
@@ -127,64 +131,107 @@ const CustomerDetailsPanel = () => {
           },
         }}
       >
-        {/* AI Avatar and Name - Now using reusable component with auto-hide */}
-        <AiAssistantTag
-          isTyping={isTypingMessage}
-          size="medium"
-          autoHide={true}
-          hideDelay={800}
-        />
-
-        {/* AI Message with Typing Animation - Hide after typing completes but maintain space */}
-        <Box
-          sx={{
-            minHeight: '3.6em', // Always maintain the space for message
-            display: 'flex',
-            alignItems: 'flex-start',
-          }}
-        >
-          {isTypingMessage && (
+        {/* Top Border with Title - Show only when AI tag disappears */}
+        {showCustomerDetails && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '32px',
+              background: 'linear-gradient(135deg, #11b67a 0%, #0c8a5a 100%)',
+              borderRadius: '24px 24px 0 0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 5,
+              opacity: 0,
+              animation: 'borderSlideIn 0.5s ease-out 0.3s forwards',
+              '@keyframes borderSlideIn': {
+                from: {
+                  opacity: 0,
+                  transform: 'translateY(-10px)',
+                },
+                to: {
+                  opacity: 1,
+                  transform: 'translateY(0)',
+                },
+              },
+            }}
+          >
             <Typography
-              variant="body2"
+              variant="caption"
               sx={{
-                color: 'text.primary',
-                fontSize: '0.875rem',
-                lineHeight: 1.5,
-                fontStyle: 'normal',
-                minHeight: '1.2em', // Prevent layout shift
+                color: 'white',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase',
               }}
             >
-              {typedMessage}
-              {/* Blinking cursor when typing */}
-              <Box
-                component="span"
-                sx={{
-                  display: 'inline-block',
-                  width: '2px',
-                  height: '1em',
-                  backgroundColor: 'primary.main',
-                  ml: 0.2,
-                  animation: 'cursor 1s infinite',
-                  '@keyframes cursor': {
-                    '0%, 50%': { opacity: 1 },
-                    '51%, 100%': { opacity: 0 },
-                  },
-                }}
-              />
+              Customer Details
             </Typography>
-          )}
-        </Box>
+          </Box>
+        )}
+
+        {/* AI Avatar and Name - Using reusable component with auto-hide */}
+        {!showCustomerDetails && (
+          <AiAssistantTag
+            isTyping={isTypingMessage}
+            size="medium"
+            autoHide={true}
+            hideDelay={800}
+          />
+        )}
+
+        {/* AI Message with Typing Animation - Hide after typing completes but maintain space */}
+        {!showCustomerDetails && (
+          <Box
+            sx={{
+              minHeight: '3.6em', // Always maintain the space for message
+              display: 'flex',
+              alignItems: 'flex-start',
+            }}
+          >
+            {isTypingMessage && (
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.primary',
+                  fontSize: '0.875rem',
+                  lineHeight: 1.5,
+                  fontStyle: 'normal',
+                  minHeight: '1.2em', // Prevent layout shift
+                }}
+              >
+                {typedMessage}
+                {/* Blinking cursor when typing */}
+                <Box
+                  component="span"
+                  sx={{
+                    display: 'inline-block',
+                    width: '2px',
+                    height: '1em',
+                    backgroundColor: 'primary.main',
+                    ml: 0.2,
+                    animation: 'cursor 1s infinite',
+                    '@keyframes cursor': {
+                      '0%, 50%': { opacity: 1 },
+                      '51%, 100%': { opacity: 0 },
+                    },
+                  }}
+                />
+              </Typography>
+            )}
+          </Box>
+        )}
 
         {/* Customer Details Section - Show only after typing completely finishes */}
         {showCustomerDetails && (
           <Box
             sx={{
               flex: 1,
-              position: 'absolute',
-              top: 24, // Start from top of component (accounting for padding)
-              left: 24,
-              right: 24,
-              bottom: 24, // Add bottom constraint
             }}
           >
             {customerDetails.map((detail, index) => (
@@ -221,8 +268,6 @@ const CustomerDetailsPanel = () => {
           </Box>
         )}
 
-        {/* Stage-specific additional info - Remove since we always show customer details now */}
-
         {/* Typing indicator for verification stage */}
         <TypingIndicator
           show={stage === 'verifying'}
@@ -230,7 +275,7 @@ const CustomerDetailsPanel = () => {
           size="small"
         />
 
-        {/* Journey completion indicator */}
+        {/* Customer completion indicator */}
         {stage === 'verified' && !isTypingMessage && (
           <Box
             sx={{
@@ -271,7 +316,7 @@ const CustomerDetailsPanel = () => {
                 fontWeight: 500,
               }}
             >
-              Customer journey completed successfully
+              Customer details verified successfully
             </Typography>
           </Box>
         )}
