@@ -1,24 +1,34 @@
 // File: src/components/common/MainContentPanel.jsx
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import useTypingAnimation from '../../hooks/useTypingAnimation';
+import AiAssistantTag from './AiAssistantTag';
 
 const MainContentPanel = () => {
   const { stage, data } = useSelector((state) => state.customer);
   const { splashVisible } = useSelector((state) => state.app);
+  const [showPanel, setShowPanel] = useState(false);
   const [showTyping, setShowTyping] = useState(false);
 
-  // Start typing animation after splash screen
+  // Show the entire panel only after SupportNeedsPanel finishes typing
   useEffect(() => {
     if (!splashVisible) {
-      // Start typing
-      const typingTimer = setTimeout(() => {
-        setShowTyping(true);
-      }, 1000);
+      // SupportNeedsPanel starts at 7s and finishes typing around 8.5-9s
+      // Show MainContentPanel after SupportNeedsPanel typing is completely done
+      const panelTimer = setTimeout(() => {
+        setShowPanel(true);
+        // Start typing animation shortly after panel appears
+        setTimeout(() => setShowTyping(true), 500);
+      }, 9000); // Show panel after SupportNeedsPanel typing finishes
+
+      // Don't render anything until panel should be shown
+      if (!showPanel) {
+        return null;
+      }
 
       return () => {
-        clearTimeout(typingTimer);
+        clearTimeout(panelTimer);
       };
     }
   }, [splashVisible]);
@@ -26,13 +36,18 @@ const MainContentPanel = () => {
   // Reset animations when stage changes
   useEffect(() => {
     if (!splashVisible) {
+      setShowPanel(false);
       setShowTyping(false);
-      const timer = setTimeout(() => setShowTyping(true), 300);
+      const timer = setTimeout(() => {
+        setShowPanel(true);
+        setTimeout(() => setShowTyping(true), 500);
+      }, 300);
       return () => clearTimeout(timer);
     }
   }, [stage, splashVisible]);
 
-  const mainContent = 'The customer calls in the Neo Bank line...';
+  const mainContent =
+    'The customer calls in the Neo Bank line and is transferred to our AI assistant for comprehensive support. All customer context has been captured and is ready for processing.';
 
   // Typing animation for main content
   const { displayText: typedContent, isTyping: isTypingContent } =
@@ -44,19 +59,37 @@ const MainContentPanel = () => {
     );
 
   return (
-    <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 3 }}>
-      {/* NeoBank Logo - Bigger */}
+    <Box
+      sx={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        gap: 1,
+        px: 2, // Add some internal padding
+      }}
+    >
+      {/* AI Assistant Tag - Show only during typing */}
+      {isTypingContent && (
+        <AiAssistantTag
+          isTyping={isTypingContent}
+          size="medium"
+          autoHide={false} // Don't auto-hide since this is the main content
+        />
+      )}
 
-      {/* Main Content - Smaller text similar to AI typing */}
-      <Box sx={{ flex: 1 }}>
+      {/* Main Content - Typing Animation */}
+      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
         <Typography
           variant="body2"
           sx={{
             color: 'text.primary',
             fontSize: '0.875rem',
-            lineHeight: 1.5,
+            lineHeight: 1.4,
             fontStyle: 'normal',
             minHeight: '1.2em', // Prevent layout shift
+            maxWidth: '100%', // Ensure text wraps properly
           }}
         >
           {typedContent}
@@ -80,6 +113,150 @@ const MainContentPanel = () => {
           )}
         </Typography>
       </Box>
+
+      {/* Verification Status and Actions - Show after typing completes */}
+      {!isTypingContent && showTyping && (
+        <Box
+          sx={{
+            width: '100%',
+            opacity: 0,
+            animation: 'slideUp 0.6s ease-out 0.5s forwards',
+            '@keyframes slideUp': {
+              from: {
+                opacity: 0,
+                transform: 'translateY(10px)',
+              },
+              to: {
+                opacity: 1,
+                transform: 'translateY(0)',
+              },
+            },
+          }}
+        >
+          {/* Status Indicator */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              mb: 1,
+              p: 1.5,
+              borderRadius: '12px',
+              backgroundColor: 'rgba(255, 152, 0, 0.08)',
+              border: '1px solid rgba(255, 152, 0, 0.3)',
+            }}
+          >
+            <Box
+              sx={{
+                width: 8,
+                height: 6,
+                borderRadius: '50%',
+                backgroundColor: '#ff9800',
+                mr: 1,
+                animation: 'pulse 2s ease-in-out infinite',
+                '@keyframes pulse': {
+                  '0%, 100%': {
+                    opacity: 1,
+                    transform: 'scale(1)',
+                  },
+                  '50%': {
+                    opacity: 0.7,
+                    transform: 'scale(1.1)',
+                  },
+                },
+              }}
+            />
+            <Typography
+              variant="caption"
+              sx={{
+                color: '#e65100',
+                fontSize: '0.8rem',
+                fontWeight: 500,
+              }}
+            >
+              Verification Required
+            </Typography>
+          </Box>
+
+          {/* Verification Message */}
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.primary',
+              fontSize: '0.875rem',
+              lineHeight: 1.4,
+              mb: 1,
+              fontWeight: 400,
+            }}
+          >
+            The customer is not verified, please click the button to start
+            verification using the eligible methods or you can force verify to
+            Standard.
+          </Typography>
+
+          {/* Action Buttons */}
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 2,
+              alignItems: 'center',
+            }}
+          >
+            <Button
+              variant="contained"
+              sx={{
+                background: 'linear-gradient(135deg, #11b67a 0%, #0c8a5a 100%)',
+                color: 'white',
+                px: 2,
+                py: 0.5,
+                borderRadius: '8px',
+                textTransform: 'none',
+                fontWeight: 500,
+                fontSize: '0.875rem',
+                boxShadow: '0 4px 16px rgba(17, 182, 122, 0.3)',
+                '&:hover': {
+                  background:
+                    'linear-gradient(135deg, #0c8a5a 0%, #095d44 100%)',
+                  boxShadow: '0 6px 20px rgba(17, 182, 122, 0.4)',
+                  transform: 'translateY(-1px)',
+                },
+                transition: 'all 0.2s ease-in-out',
+              }}
+              onClick={() => {
+                console.log('Starting verification process...');
+                // TODO: Implement verification flow
+              }}
+            >
+              Verify
+            </Button>
+
+            <Button
+              variant="outlined"
+              sx={{
+                borderColor: '#ff9800',
+                color: '#e65100',
+                px: 2,
+                py: 0.5,
+                borderRadius: '8px',
+                textTransform: 'none',
+                fontWeight: 500,
+                fontSize: '0.875rem',
+                '&:hover': {
+                  borderColor: '#f57c00',
+                  backgroundColor: 'rgba(255, 152, 0, 0.04)',
+                  transform: 'translateY(-1px)',
+                },
+                transition: 'all 0.2s ease-in-out',
+              }}
+              onClick={() => {
+                console.log('Force verifying to Standard...');
+                // TODO: Implement force verification
+              }}
+            >
+              Force Verify
+            </Button>
+          </Box>
+        </Box>
+      )}
     </Box>
   );
 };

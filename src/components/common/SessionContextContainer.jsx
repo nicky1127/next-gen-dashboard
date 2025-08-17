@@ -20,27 +20,34 @@ const SessionContextContainer = () => {
         position: 'relative',
         overflow: 'hidden',
         pt: '20px', // Increased top padding for logo tag clearance
-        px: '10px', // Left and right padding
+        px: '50px', // Increased left and right padding from 10px to 50px
         pb: '10px', // Bottom padding
       }}
     >
-      <Container
-        maxWidth="lg"
-        sx={{ position: 'relative', zIndex: 2, height: '100%', p: 0 }}
+      {/* Removed Container with maxWidth="lg" constraint */}
+      <Box
+        sx={{
+          position: 'relative',
+          zIndex: 2,
+          height: '100%',
+          width: '100%', // Full width instead of container constraint
+          p: 0,
+        }}
       >
         <Box
           sx={{
             display: 'flex',
             alignItems: 'stretch', // Changed to stretch for full height
+            justifyContent: 'center', // Center all child components
             height: '100%',
             gap: 3,
             position: 'relative',
           }}
         >
-          {/* IvrContextPanel - Fixed width */}
+          {/* IvrContextPanel - Slightly wider than CustomerDetailsPanel */}
           <Box
             sx={{
-              flex: '0 0 320px', // Fixed 320px width
+              flex: '0 0 560px', // Increased from 520px to 560px (80px wider than CustomerDetailsPanel)
               display: 'flex',
               alignItems: 'stretch', // Full height alignment
               minWidth: 0, // Allow shrinking without breaking layout
@@ -49,10 +56,10 @@ const SessionContextContainer = () => {
             <IvrContextPanel />
           </Box>
 
-          {/* CustomerDetailsPanel - Fixed width */}
+          {/* CustomerDetailsPanel - Keep existing width */}
           <Box
             sx={{
-              flex: '0 0 480px', // Fixed 480px width
+              flex: '0 0 480px', // Unchanged - 480px width
               display: 'flex',
               alignItems: 'stretch', // Full height alignment
               minWidth: 0, // Allow shrinking without breaking layout
@@ -61,10 +68,10 @@ const SessionContextContainer = () => {
             <CustomerDetailsPanel />
           </Box>
 
-          {/* SupportNeedsPanel - Fixed width */}
+          {/* SupportNeedsPanel - Reduced width */}
           <Box
             sx={{
-              flex: '0 0 200px', // Fixed 200px width
+              flex: '0 0 280px', // Reduced from 320px to 280px (40px narrower)
               display: 'flex',
               alignItems: 'stretch', // Full height alignment
               minWidth: 0, // Allow shrinking without breaking layout
@@ -79,13 +86,13 @@ const SessionContextContainer = () => {
               flex: '1', // Takes all remaining space
               display: 'flex',
               alignItems: 'center',
-              minWidth: '400px', // Minimum width to ensure it's substantial
+              minWidth: '340px', // Reduced minimum width since we have more space
             }}
           >
             <MainContentPanel />
           </Box>
         </Box>
-      </Container>
+      </Box>
 
       {/* Background decoration with green accents */}
       <Box
