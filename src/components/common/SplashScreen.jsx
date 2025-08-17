@@ -1,6 +1,6 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import { Box, Typography, LinearProgress, Fade } from "@mui/material";
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { Box, Typography, LinearProgress, Fade } from '@mui/material';
 
 const SplashScreen = () => {
   const { splashVisible } = useSelector((state) => state.app);
@@ -9,31 +9,31 @@ const SplashScreen = () => {
     <Fade in={splashVisible} timeout={500}>
       <Box
         sx={{
-          position: "fixed",
+          position: 'fixed',
           top: 0,
           left: 0,
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%)",
-          color: "white",
+          width: '100vw',
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%)',
+          color: 'white',
           zIndex: 9999,
-          visibility: splashVisible ? "visible" : "hidden",
+          visibility: splashVisible ? 'visible' : 'hidden',
         }}
       >
-        <Box sx={{ textAlign: "center", mb: 4 }}>
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
           <Typography
             variant="h1"
             sx={{
               mb: 2,
               fontWeight: 200,
-              background: "linear-gradient(45deg, #ffffff 30%, #2196f3 90%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
+              background: 'linear-gradient(45deg, #ffffff 30%, #11b67a 90%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
             }}
           >
             NeoBank
@@ -43,7 +43,7 @@ const SplashScreen = () => {
             sx={{
               mb: 4,
               fontWeight: 300,
-              color: "rgba(255, 255, 255, 0.8)",
+              color: 'rgba(255, 255, 255, 0.8)',
             }}
           >
             AI-Powered Banking
@@ -51,9 +51,9 @@ const SplashScreen = () => {
           <Typography
             variant="body1"
             sx={{
-              color: "rgba(255, 255, 255, 0.6)",
+              color: 'rgba(255, 255, 255, 0.6)',
               maxWidth: 400,
-              mx: "auto",
+              mx: 'auto',
               lineHeight: 1.6,
             }}
           >
@@ -66,9 +66,9 @@ const SplashScreen = () => {
             sx={{
               height: 2,
               borderRadius: 1,
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
-              "& .MuiLinearProgress-bar": {
-                backgroundColor: "#2196f3",
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              '& .MuiLinearProgress-bar': {
+                backgroundColor: '#11b67a',
               },
             }}
           />

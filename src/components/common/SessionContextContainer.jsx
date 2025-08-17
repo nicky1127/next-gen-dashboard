@@ -1,42 +1,11 @@
+// File: src/components/common/SessionContextContainer.jsx
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { Box, Typography, Container, Paper } from '@mui/material';
+import { Box, Container, Paper } from '@mui/material';
 import CustomerDetailsPanel from './CustomerDetailsPanel';
+import MainContentPanel from './MainContentPanel';
+import SupportNeedsPanel from './SupportNeedsPanel';
 
 const SessionContextContainer = () => {
-  const { stage, data } = useSelector((state) => state.customer);
-  const { splashVisible } = useSelector((state) => state.app);
-
-  const getStageTitle = () => {
-    switch (stage) {
-      case 'initial':
-        return 'Welcome to NeoBank';
-      case 'identifying':
-        return 'Customer Identification';
-      case 'verifying':
-        return 'Identity Verification';
-      case 'verified':
-        return `Welcome, ${data.name}`;
-      default:
-        return 'NeoBank';
-    }
-  };
-
-  const getStageDescription = () => {
-    switch (stage) {
-      case 'initial':
-        return 'Ready to begin your AI-powered banking experience';
-      case 'identifying':
-        return 'Please provide your identification details';
-      case 'verifying':
-        return 'Verifying your identity with advanced AI security';
-      case 'verified':
-        return 'Identity verified • Account ready';
-      default:
-        return '';
-    }
-  };
-
   return (
     <Paper
       sx={{
@@ -49,66 +18,60 @@ const SessionContextContainer = () => {
         boxShadow: 'none',
         position: 'relative',
         overflow: 'hidden',
+        p: '10px', // 10px padding on all sides
       }}
     >
       <Container
         maxWidth="lg"
-        sx={{ position: 'relative', zIndex: 2, height: '100%' }}
+        sx={{ position: 'relative', zIndex: 2, height: '100%', p: 0 }}
       >
         <Box
           sx={{
             display: 'flex',
-            alignItems: 'center',
+            alignItems: 'stretch', // Changed to stretch for full height
             height: '100%',
             gap: 3,
+            position: 'relative',
           }}
         >
-          {/* CustomerDetailsPanel - Left Side (1/3 width) */}
+          {/* CustomerDetailsPanel - Left Side (flexible width) */}
           <Box
             sx={{
-              flex: '0 0 33.333%',
+              flex: '0 0 auto', // Don't grow or shrink, size to content
               display: 'flex',
-              alignItems: 'center',
+              alignItems: 'stretch', // Full height alignment
+              minWidth: 0, // Allow shrinking without breaking layout
             }}
           >
             <CustomerDetailsPanel />
           </Box>
 
-          {/* Main Content Area - Right Side (2/3 width) */}
+          {/* SupportNeedsPanel - Next to CustomerDetailsPanel */}
+          <Box
+            sx={{
+              flex: '0 0 auto', // Don't grow or shrink, size to content
+              display: 'flex',
+              alignItems: 'stretch', // Full height alignment
+              minWidth: 0, // Allow shrinking without breaking layout
+            }}
+          >
+            <SupportNeedsPanel />
+          </Box>
+
+          {/* Main Content Area - Right Side (remaining width) */}
           <Box
             sx={{
               flex: '1',
               display: 'flex',
               alignItems: 'center',
-              minHeight: '120px',
             }}
           >
-            <Box sx={{ flex: 1 }}>
-              <Typography
-                variant="h2"
-                sx={{
-                  mb: 1,
-                  color: 'text.primary',
-                  fontWeight: 300,
-                }}
-              >
-                {getStageTitle()}
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  color: 'text.secondary',
-                  fontSize: '1.1rem',
-                }}
-              >
-                {getStageDescription()}
-              </Typography>
-            </Box>
+            <MainContentPanel />
           </Box>
         </Box>
       </Container>
 
-      {/* Background decoration */}
+      {/* Background decoration with green accents */}
       <Box
         sx={{
           position: 'absolute',
@@ -117,8 +80,8 @@ const SessionContextContainer = () => {
           right: 0,
           bottom: 0,
           background: `
-            radial-gradient(circle at 15% 50%, rgba(33, 150, 243, 0.03) 0%, transparent 40%),
-            radial-gradient(circle at 85% 30%, rgba(33, 150, 243, 0.02) 0%, transparent 30%)
+            radial-gradient(circle at 15% 50%, rgba(17, 182, 122, 0.03) 0%, transparent 40%),
+            radial-gradient(circle at 85% 30%, rgba(17, 182, 122, 0.02) 0%, transparent 30%)
           `,
           zIndex: 1,
         }}

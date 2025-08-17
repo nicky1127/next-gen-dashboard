@@ -1,0 +1,89 @@
+<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Primary gradient for the icon -->
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#11b67a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0c8a5a;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Secondary gradient for accents -->
+    <linearGradient id="secondaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#006a4d;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#004d38;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Subtle glow effect -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Drop shadow for depth -->
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+  
+  <!-- Main trademark icon centered -->
+  <g transform="translate(30, 30)" filter="url(#shadow)">
+    <!-- Outer hexagonal ring -->
+    <polygon points="20,0 15,8.66 -15,8.66 -20,0 -15,-8.66 15,-8.66" 
+             fill="none" 
+             stroke="url(#primaryGradient)" 
+             stroke-width="1.5" 
+             opacity="0.4"/>
+    
+    <!-- Inner hexagonal background -->
+    <polygon points="16,0 12,6.93 -12,6.93 -16,0 -12,-6.93 12,-6.93" 
+             fill="url(#primaryGradient)" 
+             opacity="0.08"/>
+    
+    <!-- Modern "N" letterform -->
+    <g fill="url(#primaryGradient)" filter="url(#glow)">
+      <!-- Left vertical bar -->
+      <rect x="-12" y="-10" width="3" height="20" rx="1.5"/>
+      
+      <!-- Right vertical bar -->
+      <rect x="9" y="-10" width="3" height="20" rx="1.5"/>
+      
+      <!-- Diagonal connecting element -->
+      <path d="M -9 -10 L 9 10 L 6 10 L -12 -10 Z" opacity="0.9"/>
+      
+      <!-- Top accent dot -->
+      <circle cx="0" cy="-6" r="2" fill="url(#secondaryGradient)" opacity="0.8"/>
+      
+      <!-- Bottom accent elements -->
+      <rect x="-5" y="6" width="10" height="1.5" rx="0.75" fill="url(#secondaryGradient)" opacity="0.6"/>
+      <circle cx="-8" cy="8" r="1" fill="url(#secondaryGradient)" opacity="0.5"/>
+      <circle cx="8" cy="8" r="1" fill="url(#secondaryGradient)" opacity="0.5"/>
+    </g>
+    
+    <!-- Tech circuit elements around the logo -->
+    <g stroke="url(#primaryGradient)" stroke-width="1" fill="none" opacity="0.3">
+      <!-- Left connection -->
+      <circle cx="-18" cy="-3" r="1.5" fill="url(#primaryGradient)"/>
+      <line x1="-18" y1="-3" x2="-15" y2="-3"/>
+      
+      <!-- Right connection -->
+      <circle cx="18" cy="3" r="1.5" fill="url(#primaryGradient)"/>
+      <line x1="15" y1="3" x2="18" y2="3"/>
+      
+      <!-- Top connection -->
+      <circle cx="0" cy="-18" r="1" fill="url(#secondaryGradient)"/>
+      <line x1="0" y1="-18" x2="0" y2="-15"/>
+      
+      <!-- Bottom connection -->
+      <circle cx="0" cy="18" r="1" fill="url(#secondaryGradient)"/>
+      <line x1="0" y1="15" x2="0" y2="18"/>
+    </g>
+    
+    <!-- Subtle data flow lines -->
+    <g stroke="url(#secondaryGradient)" stroke-width="0.5" fill="none" opacity="0.2" stroke-dasharray="2,3">
+      <path d="M -12 -15 Q 0 -18 12 -15"/>
+      <path d="M -12 15 Q 0 18 12 15"/>
+    </g>
+  </g>
+</svg>

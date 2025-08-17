@@ -1,0 +1,76 @@
+// File: src/hooks/useTypingAnimation.js
+import { useState, useEffect, useRef } from 'react';
+
+/**
+ * Custom hook for typing animation effect
+ * @param {string} text - The text to animate
+ * @param {number} speed - Typing speed in milliseconds (default: 50)
+ * @param {number} delay - Initial delay before starting animation (default: 0)
+ * @param {boolean} trigger - When to start/restart the animation (default: true)
+ * @returns {object} - { displayText, isTyping, restart }
+ */
+const useTypingAnimation = (text, speed = 50, delay = 0, trigger = true) => {
+  const [displayText, setDisplayText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const timeoutRef = useRef(null);
+  const indexRef = useRef(0);
+
+  const restart = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setDisplayText('');
+    setIsTyping(false);
+    indexRef.current = 0;
+  };
+
+  useEffect(() => {
+    if (!trigger || !text) {
+      setDisplayText(text || '');
+      setIsTyping(false);
+      return;
+    }
+
+    // Clear any existing timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    // Reset state
+    setDisplayText('');
+    setIsTyping(true);
+    indexRef.current = 0;
+
+    // Start typing animation after initial delay
+    const startTyping = () => {
+      const typeNextCharacter = () => {
+        if (indexRef.current < text.length) {
+          setDisplayText(text.slice(0, indexRef.current + 1));
+          indexRef.current++;
+          timeoutRef.current = setTimeout(typeNextCharacter, speed);
+        } else {
+          setIsTyping(false);
+        }
+      };
+
+      typeNextCharacter();
+    };
+
+    if (delay > 0) {
+      timeoutRef.current = setTimeout(startTyping, delay);
+    } else {
+      startTyping();
+    }
+
+    // Cleanup function
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [text, speed, delay, trigger]);
+
+  return { displayText, isTyping, restart };
+};
+
+export default useTypingAnimation;

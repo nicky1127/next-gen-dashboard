@@ -1,0 +1,190 @@
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fafafa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f0f0f0;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Primary green gradient -->
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#11b67a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0c8a5a;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Secondary green gradient -->
+    <linearGradient id="secondaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#006a4d;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#004d38;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Glow effect -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Subtle shadow -->
+    <filter id="subtleShadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="url(#bgGradient)"/>
+  
+  <!-- Circuit board patterns -->
+  <!-- Horizontal lines -->
+  <g stroke="#11b67a" stroke-width="1" opacity="0.3" fill="none">
+    <line x1="0" y1="150" x2="400" y2="150"/>
+    <line x1="500" y1="200" x2="800" y2="200"/>
+    <line x1="200" y1="350" x2="600" y2="350"/>
+    <line x1="700" y1="400" x2="1200" y2="400"/>
+    <line x1="0" y1="550" x2="500" y2="550"/>
+    <line x1="600" y1="600" x2="1000" y2="600"/>
+  </g>
+  
+  <!-- Vertical lines -->
+  <g stroke="#11b67a" stroke-width="1" opacity="0.3" fill="none">
+    <line x1="200" y1="0" x2="200" y2="300"/>
+    <line x1="400" y1="100" x2="400" y2="500"/>
+    <line x1="600" y1="200" x2="600" y2="800"/>
+    <line x1="800" y1="0" x2="800" y2="350"/>
+    <line x1="1000" y1="150" x2="1000" y2="700"/>
+  </g>
+  
+  <!-- Neural network nodes -->
+  <g fill="url(#primaryGradient)" filter="url(#glow)">
+    <!-- Large central node -->
+    <circle cx="600" cy="400" r="12"/>
+    
+    <!-- Medium nodes -->
+    <circle cx="300" cy="250" r="8"/>
+    <circle cx="450" cy="180" r="8"/>
+    <circle cx="750" cy="300" r="8"/>
+    <circle cx="850" cy="500" r="8"/>
+    <circle cx="350" cy="550" r="8"/>
+    
+    <!-- Small nodes -->
+    <circle cx="200" cy="150" r="5"/>
+    <circle cx="400" cy="150" r="5"/>
+    <circle cx="500" cy="200" r="5"/>
+    <circle cx="800" cy="200" r="5"/>
+    <circle cx="200" cy="350" r="5"/>
+    <circle cx="600" cy="350" r="5"/>
+    <circle cx="700" cy="400" r="5"/>
+    <circle cx="1000" cy="400" r="5"/>
+    <circle cx="500" cy="550" r="5"/>
+    <circle cx="600" cy="600" r="5"/>
+    <circle cx="1000" cy="600" r="5"/>
+    <circle cx="200" cy="300" r="5"/>
+    <circle cx="400" cy="500" r="5"/>
+    <circle cx="600" cy="200" r="5"/>
+    <circle cx="800" cy="350" r="5"/>
+    <circle cx="1000" cy="150" r="5"/>
+    <circle cx="1000" cy="700" r="5"/>
+  </g>
+  
+  <!-- Connection lines between nodes -->
+  <g stroke="#11b67a" stroke-width="1.5" opacity="0.4" fill="none">
+    <!-- Central hub connections -->
+    <line x1="600" y1="400" x2="300" y2="250"/>
+    <line x1="600" y1="400" x2="450" y2="180"/>
+    <line x1="600" y1="400" x2="750" y2="300"/>
+    <line x1="600" y1="400" x2="850" y2="500"/>
+    <line x1="600" y1="400" x2="350" y2="550"/>
+    
+    <!-- Secondary connections -->
+    <line x1="300" y1="250" x2="200" y2="150"/>
+    <line x1="300" y1="250" x2="200" y2="350"/>
+    <line x1="450" y1="180" x2="500" y2="200"/>
+    <line x1="750" y1="300" x2="800" y2="200"/>
+    <line x1="750" y1="300" x2="700" y2="400"/>
+    <line x1="850" y1="500" x2="1000" y2="400"/>
+    <line x1="350" y1="550" x2="500" y2="550"/>
+  </g>
+  
+  <!-- Data flow animations (represented as dashed lines) -->
+  <g stroke="#006a4d" stroke-width="2" opacity="0.6" fill="none" stroke-dasharray="5,10">
+    <path d="M 100 100 Q 300 200 500 150 T 900 200"/>
+    <path d="M 1100 650 Q 800 550 600 600 T 200 550"/>
+    <path d="M 50 400 Q 250 300 450 350 T 850 250"/>
+  </g>
+  
+  <!-- Central AI logo -->
+  <g transform="translate(550, 350)" filter="url(#subtleShadow)">
+    <!-- Hexagonal frame -->
+    <polygon points="50,0 25,43.3 -25,43.3 -50,0 -25,-43.3 25,-43.3" 
+             fill="none" 
+             stroke="url(#primaryGradient)" 
+             stroke-width="2"/>
+    
+    <!-- Inner elements -->
+    <g fill="url(#secondaryGradient)" opacity="0.8">
+      <!-- AI representation -->
+      <circle cx="-15" cy="-10" r="3"/>
+      <circle cx="15" cy="-10" r="3"/>
+      <circle cx="0" cy="0" r="2"/>
+      <circle cx="-8" cy="15" r="2"/>
+      <circle cx="8" cy="15" r="2"/>
+      
+      <!-- Connecting lines -->
+      <g stroke="url(#secondaryGradient)" stroke-width="1" fill="none">
+        <line x1="-15" y1="-10" x2="0" y2="0"/>
+        <line x1="15" y1="-10" x2="0" y2="0"/>
+        <line x1="0" y1="0" x2="-8" y2="15"/>
+        <line x1="0" y1="0" x2="8" y2="15"/>
+      </g>
+    </g>
+  </g>
+  
+  <!-- Floating geometric elements -->
+  <g fill="#11b67a" opacity="0.1">
+    <rect x="100" y="50" width="20" height="20" transform="rotate(45 110 60)"/>
+    <rect x="950" y="100" width="15" height="15" transform="rotate(30 957.5 107.5)"/>
+    <polygon points="150,700 165,730 135,730" opacity="0.15"/>
+    <polygon points="1050,650 1065,680 1035,680" opacity="0.15"/>
+    <circle cx="80" cy="300" r="8" opacity="0.12"/>
+    <circle cx="1100" cy="250" r="6" opacity="0.12"/>
+  </g>
+  
+  <!-- Subtle grid overlay -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#11b67a" stroke-width="0.5" opacity="0.05"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="800" fill="url(#grid)"/>
+  
+  <!-- Central text area (where main content would appear) -->
+  <g transform="translate(600, 400)" text-anchor="middle" fill="#1a1a1a">
+    <text y="-80" font-family="Inter, sans-serif" font-size="48" font-weight="300" opacity="0.8">
+      Next-Generation Banking
+    </text>
+    <text y="-30" font-family="Inter, sans-serif" font-size="18" opacity="0.6">
+      Experience the future of financial services powered by artificial intelligence
+    </text>
+    <text y="10" font-family="Inter, sans-serif" font-size="16" opacity="0.5">
+      Secure • Intelligent • Designed for the modern world
+    </text>
+  </g>
+  
+  <!-- Feature indicators -->
+  <g transform="translate(600, 520)">
+    <g transform="translate(-120, 0)" text-anchor="middle">
+      <circle cx="0" cy="0" r="6" fill="url(#primaryGradient)"/>
+      <text y="25" font-family="Inter, sans-serif" font-size="12" fill="#666666">AI Security</text>
+    </g>
+    <g transform="translate(0, 0)" text-anchor="middle">
+      <circle cx="0" cy="0" r="6" fill="url(#primaryGradient)"/>
+      <text y="25" font-family="Inter, sans-serif" font-size="12" fill="#666666">Smart Analytics</text>
+    </g>
+    <g transform="translate(120, 0)" text-anchor="middle">
+      <circle cx="0" cy="0" r="6" fill="url(#primaryGradient)"/>
+      <text y="25" font-family="Inter, sans-serif" font-size="12" fill="#666666">Instant Processing</text>
+    </g>
+  </g>
+</svg>

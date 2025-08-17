@@ -1,4 +1,4 @@
-// File: src/components/common/CustomerDetailsPanel.jsx
+// File: src/components/common/SupportNeedsPanel.jsx
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Box, Typography, Grow } from '@mui/material';
@@ -6,62 +6,47 @@ import useTypingAnimation from '../../hooks/useTypingAnimation';
 import TypingIndicator from './TypingIndicator';
 import AiAssistantTag from './AiAssistantTag';
 
-const CustomerDetailsPanel = () => {
+const SupportNeedsPanel = () => {
   const { stage, data } = useSelector((state) => state.customer);
   const { splashVisible } = useSelector((state) => state.app);
   const [showPanel, setShowPanel] = useState(false);
   const [showTyping, setShowTyping] = useState(false);
-  const [showCustomerDetails, setShowCustomerDetails] = useState(false);
+  const [showSupportDetails, setShowSupportDetails] = useState(false);
   const [showFinalView, setShowFinalView] = useState(false);
 
-  // Trigger panel animation after splash screen fades
+  // Watch for CustomerDetailsPanel to reach final view
+  // This is a simplified approach - in a real app you'd use a shared state or context
   useEffect(() => {
     if (!splashVisible) {
+      // Start SupportNeedsPanel after CustomerDetailsPanel animations complete
+      // CustomerDetailsPanel: 500ms panel + 500ms typing start + typing time + 800ms delay + 1000ms final view
+      // Estimated total: ~4-5 seconds
       const timer = setTimeout(() => {
         setShowPanel(true);
         // Start typing animation after panel appears
         setTimeout(() => setShowTyping(true), 500);
-      }, 500);
+      }, 4500); // Start when customer details should be in final view
 
       return () => clearTimeout(timer);
     }
   }, [splashVisible]);
 
-  // Reset typing animation when stage changes
-  useEffect(() => {
-    if (showPanel) {
-      setShowTyping(false);
-      const timer = setTimeout(() => setShowTyping(true), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [stage, showPanel]);
-
-  const getCustomerDetails = () => {
-    // Use sample data when no real data is available, or mix with real data
-    const sampleData = {
-      name: data.name || 'Chris Smith',
-      dateOfBirth: '14/02/1978 (47)',
-      phone: data.phone || '+44 7700 900123',
-      verified: data.verified !== undefined ? data.verified : false,
-    };
-
+  const getSupportDetails = () => {
+    // Support needs data
     const details = [];
 
-    details.push(`Name: ${sampleData.name}`);
-    details.push(`DoB: ${sampleData.dateOfBirth}`);
-    details.push(`Phone: ${sampleData.phone}`);
-    details.push(`Verified: ${sampleData.verified ? 'Yes' : 'Pending'}`);
+    details.push(`018 - Check address`);
+    details.push(`021 - Polish Speaking`);
+    details.push(`026 - Do not teleport`);
 
     return details;
   };
 
-  const customerDetails = getCustomerDetails();
+  const supportDetails = getSupportDetails();
 
-  // Get the main message based on stage and data
+  // Get the main message
   const getMainMessage = () => {
-    const baseMessage =
-      "Hello! I'm here to guide you through the customer journey.";
-    return `${baseMessage} Here are the details about the customer:`;
+    return 'Here is the support needs indicators in association with the customer...';
   };
 
   const mainMessage = getMainMessage();
@@ -75,18 +60,31 @@ const CustomerDetailsPanel = () => {
       showTyping
     );
 
-  // Show customer details only after typing animation completes
+  // Reset typing animation when stage changes
+  useEffect(() => {
+    if (showPanel) {
+      setShowTyping(false);
+      setShowFinalView(false);
+      const timer = setTimeout(() => setShowTyping(true), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [stage, showPanel]);
+
+  // Show support details only after typing animation completes
   useEffect(() => {
     if (!isTypingMessage && showTyping) {
-      // Longer delay to create a gap between hello message and customer details
+      // Small delay to ensure smooth transition
       const timer = setTimeout(() => {
-        setShowCustomerDetails(true);
-      }, 800); // Increased from 200ms to 800ms
+        setShowSupportDetails(true);
+        // Switch to final view after support details appear
+        setTimeout(() => setShowFinalView(true), 1000);
+      }, 800);
 
       return () => clearTimeout(timer);
     } else if (isTypingMessage) {
-      // Hide customer details when typing starts (for stage changes)
-      setShowCustomerDetails(false);
+      // Hide support details when typing starts (for stage changes)
+      setShowSupportDetails(false);
+      setShowFinalView(false);
     }
   }, [isTypingMessage, showTyping]);
 
@@ -102,7 +100,7 @@ const CustomerDetailsPanel = () => {
           padding: 3,
           height: showFinalView ? '100%' : 'auto', // 100% height in final view
           minHeight: showFinalView ? 'unset' : '120px', // Remove minHeight in final view
-          width: '100%', // Take full width of container (max 20%)
+          width: '100%', // Take full width of container
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-start',
@@ -127,7 +125,7 @@ const CustomerDetailsPanel = () => {
           },
         }}
       >
-        {/* AI Avatar and Name - Now using reusable component with auto-hide */}
+        {/* AI Avatar and Name - Using reusable component with auto-hide */}
         <AiAssistantTag
           isTyping={isTypingMessage}
           size="medium"
@@ -175,8 +173,8 @@ const CustomerDetailsPanel = () => {
           )}
         </Box>
 
-        {/* Customer Details Section - Show only after typing completely finishes */}
-        {showCustomerDetails && (
+        {/* Support Details Section - Show only after typing completely finishes */}
+        {showSupportDetails && (
           <Box
             sx={{
               flex: 1,
@@ -187,7 +185,7 @@ const CustomerDetailsPanel = () => {
               bottom: 24, // Add bottom constraint
             }}
           >
-            {customerDetails.map((detail, index) => (
+            {supportDetails.map((detail, index) => (
               <Typography
                 key={index}
                 variant="caption"
@@ -221,16 +219,14 @@ const CustomerDetailsPanel = () => {
           </Box>
         )}
 
-        {/* Stage-specific additional info - Remove since we always show customer details now */}
-
         {/* Typing indicator for verification stage */}
         <TypingIndicator
           show={stage === 'verifying'}
-          message="AI is processing customer data..."
+          message="AI is processing support request..."
           size="small"
         />
 
-        {/* Journey completion indicator */}
+        {/* Support completion indicator */}
         {stage === 'verified' && !isTypingMessage && (
           <Box
             sx={{
@@ -271,7 +267,7 @@ const CustomerDetailsPanel = () => {
                 fontWeight: 500,
               }}
             >
-              Customer journey completed successfully
+              Support request processed successfully
             </Typography>
           </Box>
         )}
@@ -280,4 +276,4 @@ const CustomerDetailsPanel = () => {
   );
 };
 
-export default CustomerDetailsPanel;
+export default SupportNeedsPanel;
