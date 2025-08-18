@@ -1,0 +1,13 @@
+<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="secure-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fa709a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fee140;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="60" height="60" rx="12" fill="url(#secure-gradient)"/>
+  <path d="M30 15 L22 20 L22 32 Q22 38 30 40 Q38 38 38 32 L38 20 Z" fill="white" opacity="0.9"/>
+  <circle cx="30" cy="28" r="3" fill="url(#secure-gradient)"/>
+  <rect x="28" y="31" width="4" height="6" fill="url(#secure-gradient)"/>
+  <text x="30" y="52" text-anchor="middle" fill="white" font-family="Arial" font-size="7" font-weight="bold">SecureBank</text>
+</svg>

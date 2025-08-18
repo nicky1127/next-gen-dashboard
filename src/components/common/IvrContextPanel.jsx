@@ -38,18 +38,22 @@ const IvrContextPanel = () => {
   }, [stage, showPanel]);
 
   const getIvrDetails = () => {
-    // IVR context data
+    // IVR context data with separated labels and values
     const details = [];
 
-    details.push(`Wait Time: 00:00:05`);
-    details.push(`Call Reason: Change of Address`);
-    details.push(`Utterance: I'm calling to update my address`);
-    details.push(
-      `B/O Reason: INFO-Cust doesn't have their account number with them`
-    );
-    details.push(`Breakout Time: 18:45:56`);
-    details.push(`Call Number: 07544129854`);
-    details.push(`VDN: 1116158`);
+    details.push({ label: 'Wait Time:', value: '00:00:05' });
+    details.push({ label: 'Call Reason:', value: 'Change of Address' });
+    details.push({
+      label: 'Utterance:',
+      value: "I'm calling to update my address",
+    });
+    details.push({
+      label: 'B/O Reason:',
+      value: "INFO-Cust doesn't have their account number with them",
+    });
+    details.push({ label: 'Breakout Time:', value: '18:45:56' });
+    details.push({ label: 'Call Number:', value: '07544129854' });
+    details.push({ label: 'VDN:', value: '1116158' });
 
     return details;
   };
@@ -310,7 +314,11 @@ const IvrContextPanel = () => {
                   },
                 }}
               >
-                • {detail}
+                •{' '}
+                <Box component="span" sx={{ fontWeight: 'bold' }}>
+                  {detail.label}
+                </Box>{' '}
+                {detail.value}
               </Typography>
             ))}
           </Box>

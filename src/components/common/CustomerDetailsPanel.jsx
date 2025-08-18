@@ -37,12 +37,15 @@ const CustomerDetailsPanel = () => {
 
     const details = [];
 
-    details.push(`Name: ${sampleData.name}`);
-    details.push(`DoB: ${sampleData.dateOfBirth}`);
-    details.push(`Home: 07845132587`);
-    details.push(`Mobile: 07412459865`);
-    details.push(`Work: 07614578945`);
-    details.push(`Verified: ${sampleData.verified ? 'Yes' : 'Pending'}`);
+    details.push({ label: 'Name:', value: sampleData.name });
+    details.push({ label: 'DoB:', value: sampleData.dateOfBirth });
+    details.push({ label: 'Home:', value: '07845132587' });
+    details.push({ label: 'Mobile:', value: '07412459865' });
+    details.push({ label: 'Work:', value: '07614578945' });
+    details.push({
+      label: 'Verified:',
+      value: sampleData.verified ? 'Yes' : 'Pending',
+    });
 
     return details;
   };
@@ -278,7 +281,11 @@ const CustomerDetailsPanel = () => {
                     },
                   }}
                 >
-                  • {detail}
+                  •{' '}
+                  <Box component="span" sx={{ fontWeight: 'bold' }}>
+                    {detail.label}
+                  </Box>{' '}
+                  {detail.value}
                 </Typography>
               ))}
             </Box>
@@ -330,7 +337,9 @@ const CustomerDetailsPanel = () => {
                   },
                 }}
               >
-                Address:
+                <Box component="span" sx={{ fontWeight: 'bold' }}>
+                  Address:
+                </Box>
               </Typography>
               {customerAddress.map((line, index) => (
                 <Typography

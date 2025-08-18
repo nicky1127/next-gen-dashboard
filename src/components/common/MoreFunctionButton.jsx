@@ -23,12 +23,14 @@ import {
   Menu,
   ClearAll,
 } from '@mui/icons-material';
+import QuickAppLauncher from './QuickAppLauncher';
 
 const MoreFunctionButton = ({ onClick }) => {
   const { splashVisible } = useSelector((state) => state.app);
   const [showButton, setShowButton] = useState(false);
   const [showSatellites, setShowSatellites] = useState(false);
   const [showChatbot, setShowChatbot] = useState(false);
+  const [showQuickLauncher, setShowQuickLauncher] = useState(false);
   const [chatMessage, setChatMessage] = useState('');
   const [chatHistory, setChatHistory] = useState([
     {
@@ -155,27 +157,37 @@ const MoreFunctionButton = ({ onClick }) => {
     setShowSatellites(false);
   };
 
+  const handleQuickLaunchClick = () => {
+    console.log('Quick Launch clicked');
+    setShowQuickLauncher(true);
+    setShowSatellites(false);
+  };
+
+  const handleCloseQuickLauncher = () => {
+    setShowQuickLauncher(false);
+  };
+
   const satelliteButtons = [
     {
       icon: <Refresh />,
       tooltip: 'Reset',
       position: { bottom: 0, right: 100 },
       delay: 100,
-      onClick: () => console.log('Switch view clicked'),
+      onClick: () => console.log('Reset clicked'),
     },
     {
       icon: <Apps />,
       tooltip: 'Quick Launch',
       position: { bottom: 50, right: 80 },
       delay: 200,
-      onClick: () => console.log('Quick Launch clicked'),
+      onClick: handleQuickLaunchClick,
     },
     {
       icon: <SwapHoriz />,
       tooltip: 'Switch View',
       position: { bottom: 90, right: 50 },
       delay: 300,
-      onClick: () => console.log('Reset clicked'),
+      onClick: () => console.log('Switch view clicked'),
     },
     {
       icon: <AutoAwesome />,
@@ -333,8 +345,107 @@ const MoreFunctionButton = ({ onClick }) => {
           )}
         </Fab>
 
+        {/* Quick App Launcher */}
+        <QuickAppLauncher
+          open={showQuickLauncher}
+          onClose={handleCloseQuickLauncher}
+        />
+
+        {/* Floating Bubble Effects for Chatbot */}
+        {showChatbot && (
+          <Box
+            sx={{
+              position: 'fixed',
+              bottom: 150,
+              right: -50,
+              width: '500px',
+              height: '400px',
+              zIndex: 1999,
+              pointerEvents: 'none',
+              overflow: 'hidden',
+            }}
+          >
+            {/* Animated floating bubbles around chatbot */}
+            {[...Array(4)].map((_, index) => (
+              <Box
+                key={index}
+                sx={{
+                  position: 'absolute',
+                  width: `${Math.random() * 15 + 8}px`,
+                  height: `${Math.random() * 15 + 8}px`,
+                  borderRadius: '50%',
+                  background: `radial-gradient(circle, rgba(17, 182, 122, ${0.15 + Math.random() * 0.15}) 0%, transparent 70%)`,
+                  border: '1px solid rgba(17, 182, 122, 0.1)',
+                  bottom: `${20 + Math.random() * 100}px`,
+                  right: `${50 + Math.random() * 200}px`,
+                  animation: `chatbotFloatUp${index} ${2.5 + Math.random() * 1.5}s ease-out infinite`,
+                  animationDelay: `${Math.random() * 1.5}s`,
+                  '@keyframes chatbotFloatUp0': {
+                    '0%': {
+                      transform: 'translateY(0) scale(0)',
+                      opacity: 0,
+                    },
+                    '20%': {
+                      transform: 'translateY(-15px) scale(1)',
+                      opacity: 1,
+                    },
+                    '100%': {
+                      transform: 'translateY(-80px) scale(0.5)',
+                      opacity: 0,
+                    },
+                  },
+                  '@keyframes chatbotFloatUp1': {
+                    '0%': {
+                      transform: 'translateY(0) translateX(0) scale(0)',
+                      opacity: 0,
+                    },
+                    '20%': {
+                      transform: 'translateY(-12px) translateX(8px) scale(1)',
+                      opacity: 1,
+                    },
+                    '100%': {
+                      transform:
+                        'translateY(-70px) translateX(15px) scale(0.3)',
+                      opacity: 0,
+                    },
+                  },
+                  '@keyframes chatbotFloatUp2': {
+                    '0%': {
+                      transform: 'translateY(0) translateX(0) scale(0)',
+                      opacity: 0,
+                    },
+                    '20%': {
+                      transform: 'translateY(-20px) translateX(-12px) scale(1)',
+                      opacity: 1,
+                    },
+                    '100%': {
+                      transform:
+                        'translateY(-90px) translateX(-20px) scale(0.2)',
+                      opacity: 0,
+                    },
+                  },
+                  '@keyframes chatbotFloatUp3': {
+                    '0%': {
+                      transform: 'translateY(0) scale(0)',
+                      opacity: 0,
+                    },
+                    '20%': {
+                      transform: 'translateY(-18px) scale(1)',
+                      opacity: 1,
+                    },
+                    '100%': {
+                      transform: 'translateY(-85px) scale(0.4)',
+                      opacity: 0,
+                    },
+                  },
+                }}
+              />
+            ))}
+          </Box>
+        )}
+
         {/* Chatbot Popup */}
-        <Fade in={showChatbot} timeout={400}>
+        <Fade in={showChatbot} timeout={0}>
           <Paper
             sx={{
               position: 'fixed',
@@ -353,6 +464,61 @@ const MoreFunctionButton = ({ onClick }) => {
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
+              // Bubble animation - moves from down to up from AI satellite button
+              animation: showChatbot
+                ? 'chatbotBubbleExpand 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)'
+                : 'none',
+              transformOrigin: 'bottom right', // Origin point at satellite button location
+              '@keyframes chatbotBubbleExpand': {
+                '0%': {
+                  transform: 'scale(0) translateY(150px)',
+                  borderRadius: '50px',
+                  opacity: 0,
+                },
+                '60%': {
+                  transform: 'scale(1.05) translateY(-10px)',
+                  borderRadius: '25px',
+                  opacity: 0.8,
+                },
+                '100%': {
+                  transform: 'scale(1) translateY(0)',
+                  borderRadius: '20px',
+                  opacity: 1,
+                },
+              },
+              // Floating bubble decorations similar to QuickAppLauncher
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                top: 0,
+                left: 0,
+                borderRadius: '20px',
+                background: `
+                  radial-gradient(circle at 85% 20%, rgba(17, 182, 122, 0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 15% 80%, rgba(17, 182, 122, 0.05) 0%, transparent 40%),
+                  radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 30%)
+                `,
+                animation: showChatbot
+                  ? 'chatbotBubbleFloat 3s ease-in-out infinite'
+                  : 'none',
+                zIndex: 1,
+                '@keyframes chatbotBubbleFloat': {
+                  '0%, 100%': {
+                    transform: 'translate(0, 0) scale(1)',
+                    opacity: 0.6,
+                  },
+                  '33%': {
+                    transform: 'translate(2px, -1px) scale(1.02)',
+                    opacity: 0.8,
+                  },
+                  '66%': {
+                    transform: 'translate(-1px, 1px) scale(0.98)',
+                    opacity: 0.7,
+                  },
+                },
+              },
             }}
           >
             {/* Header */}
