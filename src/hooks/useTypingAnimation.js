@@ -14,10 +14,13 @@ const useTypingAnimation = (text, speed = 50, delay = 0, trigger = true) => {
   const [isTyping, setIsTyping] = useState(false);
   const timeoutRef = useRef(null);
   const indexRef = useRef(0);
+  const isMountedRef = useRef(true);
 
   const restart = () => {
+    // Clear any existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
     }
     setDisplayText('');
     setIsTyping(false);
@@ -25,15 +28,30 @@ const useTypingAnimation = (text, speed = 50, delay = 0, trigger = true) => {
   };
 
   useEffect(() => {
-    if (!trigger || !text) {
+    // Mark component as mounted
+    isMountedRef.current = true;
+
+    // Cleanup function
+    return () => {
+      isMountedRef.current = false;
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    // Clear any existing timeout first
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+
+    if (!trigger || !text || !isMountedRef.current) {
       setDisplayText(text || '');
       setIsTyping(false);
       return;
-    }
-
-    // Clear any existing timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
     }
 
     // Reset state
@@ -43,13 +61,18 @@ const useTypingAnimation = (text, speed = 50, delay = 0, trigger = true) => {
 
     // Start typing animation after initial delay
     const startTyping = () => {
+      if (!isMountedRef.current) return;
+
       const typeNextCharacter = () => {
+        if (!isMountedRef.current) return;
+
         if (indexRef.current < text.length) {
           setDisplayText(text.slice(0, indexRef.current + 1));
           indexRef.current++;
           timeoutRef.current = setTimeout(typeNextCharacter, speed);
         } else {
           setIsTyping(false);
+          timeoutRef.current = null;
         }
       };
 
@@ -62,10 +85,11 @@ const useTypingAnimation = (text, speed = 50, delay = 0, trigger = true) => {
       startTyping();
     }
 
-    // Cleanup function
+    // Cleanup function for this effect
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
     };
   }, [text, speed, delay, trigger]);

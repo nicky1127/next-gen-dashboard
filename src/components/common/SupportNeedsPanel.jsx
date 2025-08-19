@@ -6,30 +6,40 @@ import useTypingAnimation from '../../hooks/useTypingAnimation';
 import TypingIndicator from './TypingIndicator';
 import AiAssistantTag from './AiAssistantTag';
 
-const SupportNeedsPanel = () => {
+const SupportNeedsPanel = ({ skipAnimations = false }) => {
   const { stage, data } = useSelector((state) => state.customer);
   const { splashVisible } = useSelector((state) => state.app);
   const [showPanel, setShowPanel] = useState(false);
   const [showTyping, setShowTyping] = useState(false);
-  const [showSupportDetails, setShowSupportDetails] = useState(false);
-  const [showFinalView, setShowFinalView] = useState(false);
+  const [showSupportDetails, setShowSupportDetails] = useState(skipAnimations);
+  const [showFinalView, setShowFinalView] = useState(skipAnimations);
 
   // Watch for CustomerDetailsPanel to reach final view
-  // This is a simplified approach - in a real app you'd use a shared state or context
   useEffect(() => {
-    if (!splashVisible) {
-      // Start SupportNeedsPanel after CustomerDetailsPanel animations complete
-      // IvrContextPanel: 4.5s total → CustomerDetailsPanel: 4.5s + 2s = 6.5s total
-      // Start SupportNeedsPanel after CustomerDetailsPanel completes
-      const timer = setTimeout(() => {
-        setShowPanel(true);
-        // Start typing animation after panel appears
-        setTimeout(() => setShowTyping(true), 500);
-      }, 7000); // Start when customer details should be in final view
+    let timeoutId = null;
 
-      return () => clearTimeout(timer);
+    if (!splashVisible) {
+      const delay = skipAnimations ? 300 : 7000;
+
+      timeoutId = setTimeout(() => {
+        setShowPanel(true);
+        if (skipAnimations) {
+          // Skip all animations and go straight to final view
+          setShowSupportDetails(true);
+          setShowFinalView(true);
+        } else {
+          // First time - show typing animation
+          setTimeout(() => setShowTyping(true), 500);
+        }
+      }, delay);
     }
-  }, [splashVisible]);
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [splashVisible, skipAnimations]);
 
   const getSupportDetails = () => {
     // Support needs data
@@ -62,30 +72,43 @@ const SupportNeedsPanel = () => {
 
   // Reset typing animation when stage changes
   useEffect(() => {
+    let timeoutId = null;
+
     if (showPanel) {
       setShowTyping(false);
       setShowFinalView(false);
-      const timer = setTimeout(() => setShowTyping(true), 300);
-      return () => clearTimeout(timer);
+      timeoutId = setTimeout(() => setShowTyping(true), 300);
     }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [stage, showPanel]);
 
   // Show support details only after typing animation completes
   useEffect(() => {
+    let timeoutId = null;
+
     if (!isTypingMessage && showTyping) {
       // Small delay to ensure smooth transition
-      const timer = setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setShowSupportDetails(true);
         // Switch to final view after support details appear
         setTimeout(() => setShowFinalView(true), 1000);
       }, 800);
-
-      return () => clearTimeout(timer);
     } else if (isTypingMessage) {
       // Hide support details when typing starts (for stage changes)
       setShowSupportDetails(false);
       setShowFinalView(false);
     }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [isTypingMessage, showTyping]);
 
   return (

@@ -6,35 +6,57 @@ import useTypingAnimation from '../../hooks/useTypingAnimation';
 import TypingIndicator from './TypingIndicator';
 import AiAssistantTag from './AiAssistantTag';
 
-const IvrContextPanel = () => {
+const IvrContextPanel = ({ skipAnimations = false }) => {
   const { stage, data } = useSelector((state) => state.customer);
   const { splashVisible } = useSelector((state) => state.app);
   const [showPanel, setShowPanel] = useState(false);
   const [showTyping, setShowTyping] = useState(false);
-  const [showIvrDetails, setShowIvrDetails] = useState(false);
-  const [showFinalView, setShowFinalView] = useState(false);
+  const [showIvrDetails, setShowIvrDetails] = useState(skipAnimations);
+  const [showFinalView, setShowFinalView] = useState(skipAnimations);
 
   // Trigger panel animation after splash screen fades
   useEffect(() => {
-    if (!splashVisible) {
-      const timer = setTimeout(() => {
-        setShowPanel(true);
-        // Start typing animation after panel appears
-        setTimeout(() => setShowTyping(true), 500);
-      }, 500);
+    let timeoutId = null;
 
-      return () => clearTimeout(timer);
+    if (!splashVisible) {
+      timeoutId = setTimeout(
+        () => {
+          setShowPanel(true);
+          if (skipAnimations) {
+            // Skip all animations and go straight to final view
+            setShowIvrDetails(true);
+            setShowFinalView(true);
+          } else {
+            // Show typing animation
+            setTimeout(() => setShowTyping(true), 500);
+          }
+        },
+        skipAnimations ? 100 : 500
+      );
     }
-  }, [splashVisible]);
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [splashVisible, skipAnimations]);
 
   // Reset typing animation when stage changes
   useEffect(() => {
+    let timeoutId = null;
+
     if (showPanel) {
       setShowTyping(false);
       setShowFinalView(false);
-      const timer = setTimeout(() => setShowTyping(true), 300);
-      return () => clearTimeout(timer);
+      timeoutId = setTimeout(() => setShowTyping(true), 300);
     }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [stage, showPanel]);
 
   const getIvrDetails = () => {
@@ -78,20 +100,26 @@ const IvrContextPanel = () => {
 
   // Show IVR details only after typing animation completes
   useEffect(() => {
+    let timeoutId = null;
+
     if (!isTypingMessage && showTyping) {
       // Small delay to ensure smooth transition
-      const timer = setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setShowIvrDetails(true);
         // Switch to final view after IVR details appear
         setTimeout(() => setShowFinalView(true), 1000);
       }, 800);
-
-      return () => clearTimeout(timer);
     } else if (isTypingMessage) {
       // Hide IVR details when typing starts (for stage changes)
       setShowIvrDetails(false);
       setShowFinalView(false);
     }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [isTypingMessage, showTyping]);
 
   return (

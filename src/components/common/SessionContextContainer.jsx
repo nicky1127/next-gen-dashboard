@@ -6,7 +6,7 @@ import CustomerDetailsPanel from './CustomerDetailsPanel';
 import MainContentPanel from './MainContentPanel';
 import SupportNeedsPanel from './SupportNeedsPanel';
 
-const SessionContextContainer = () => {
+const SessionContextContainer = ({ skipAnimations = false }) => {
   return (
     <Paper
       sx={{
@@ -53,7 +53,7 @@ const SessionContextContainer = () => {
               minWidth: 0, // Allow shrinking without breaking layout
             }}
           >
-            <IvrContextPanel />
+            <IvrContextPanel skipAnimations={skipAnimations} />
           </Box>
 
           {/* CustomerDetailsPanel - Keep existing width */}
@@ -65,7 +65,7 @@ const SessionContextContainer = () => {
               minWidth: 0, // Allow shrinking without breaking layout
             }}
           >
-            <CustomerDetailsPanel />
+            <CustomerDetailsPanel skipAnimations={skipAnimations} />
           </Box>
 
           {/* SupportNeedsPanel - Reduced width */}
@@ -77,7 +77,7 @@ const SessionContextContainer = () => {
               minWidth: 0, // Allow shrinking without breaking layout
             }}
           >
-            <SupportNeedsPanel />
+            <SupportNeedsPanel skipAnimations={skipAnimations} />
           </Box>
 
           {/* Main Content Area - Takes remaining space */}
@@ -89,7 +89,7 @@ const SessionContextContainer = () => {
               minWidth: '340px', // Reduced minimum width since we have more space
             }}
           >
-            <MainContentPanel />
+            <MainContentPanel skipAnimations={skipAnimations} />
           </Box>
         </Box>
       </Box>

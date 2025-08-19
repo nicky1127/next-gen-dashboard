@@ -5,45 +5,58 @@ import { Box, Typography, Button } from '@mui/material';
 import useTypingAnimation from '../../hooks/useTypingAnimation';
 import AiAssistantTag from './AiAssistantTag';
 
-const MainContentPanel = () => {
+const MainContentPanel = ({ skipAnimations = false }) => {
   const { stage, data } = useSelector((state) => state.customer);
   const { splashVisible } = useSelector((state) => state.app);
-  const [showPanel, setShowPanel] = useState(false);
+  const [showPanel, setShowPanel] = useState(skipAnimations);
   const [showTyping, setShowTyping] = useState(false);
 
   // Show the entire panel only after SupportNeedsPanel finishes typing
   useEffect(() => {
+    let panelTimeoutId = null;
+    let typingTimeoutId = null;
+
     if (!splashVisible) {
-      // SupportNeedsPanel starts at 7s and finishes typing around 8.5-9s
-      // Show MainContentPanel after SupportNeedsPanel typing is completely done
-      const panelTimer = setTimeout(() => {
+      if (skipAnimations) {
+        // Skip all animations - show panel immediately
         setShowPanel(true);
-        // Start typing animation shortly after panel appears
-        setTimeout(() => setShowTyping(true), 500);
-      }, 9000); // Show panel after SupportNeedsPanel typing finishes
-
-      // Don't render anything until panel should be shown
-      if (!showPanel) {
-        return null;
+      } else {
+        // First time - show typing animation
+        panelTimeoutId = setTimeout(() => {
+          setShowPanel(true);
+          typingTimeoutId = setTimeout(() => setShowTyping(true), 500);
+        }, 9000); // Show panel after SupportNeedsPanel typing finishes
       }
-
-      return () => {
-        clearTimeout(panelTimer);
-      };
     }
-  }, [splashVisible]);
+
+    return () => {
+      if (panelTimeoutId) {
+        clearTimeout(panelTimeoutId);
+      }
+      if (typingTimeoutId) {
+        clearTimeout(typingTimeoutId);
+      }
+    };
+  }, [splashVisible, skipAnimations]);
 
   // Reset animations when stage changes
   useEffect(() => {
+    let timeoutId = null;
+
     if (!splashVisible) {
       setShowPanel(false);
       setShowTyping(false);
-      const timer = setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setShowPanel(true);
         setTimeout(() => setShowTyping(true), 500);
       }, 300);
-      return () => clearTimeout(timer);
     }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [stage, splashVisible]);
 
   const mainContent =

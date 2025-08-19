@@ -1,35 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Box, Fade, Paper, Typography, Chip, Divider } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { Box, Typography, Paper, Chip, Divider } from '@mui/material';
 import { Phone, Person, Support, Security } from '@mui/icons-material';
-import { setSplashVisible } from '../../store/slices/appSlice';
-import SplashScreen from '../common/SplashScreen';
-import SessionContextContainer from '../common/SessionContextContainer';
-import WorkingWindowArea from '../common/WorkingWindowArea';
-import MoreFunctionButton from '../common/MoreFunctionButton';
 
-// Safe SimpleViewPanel component
 const SimpleViewPanel = () => {
   const { stage, data } = useSelector((state) => state.customer);
   const { splashVisible } = useSelector((state) => state.app);
   const [showPanel, setShowPanel] = useState(false);
 
   useEffect(() => {
-    let timeoutId = null;
-
     if (!splashVisible) {
-      timeoutId = setTimeout(() => {
+      const timer = setTimeout(() => {
         setShowPanel(true);
       }, 300);
+      return () => clearTimeout(timer);
     }
-
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
   }, [splashVisible]);
 
+  // Consolidated data from all panels
   const consolidatedData = {
     ivr: {
       waitTime: '00:00:05',
@@ -48,6 +36,10 @@ const SimpleViewPanel = () => {
         '021 - Polish Speaking',
         '026 - Do not teleport',
       ],
+    },
+    status: {
+      stage: stage,
+      verification: 'Pending',
     },
   };
 
@@ -69,17 +61,31 @@ const SimpleViewPanel = () => {
         transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
       }}
     >
-      {/* Brand Logo */}
-      <Box sx={{ display: 'flex', alignItems: 'center', mr: 4 }}>
+      {/* Brand Logo - Left */}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          mr: 4,
+        }}
+      >
         <Box
           component="img"
           src={`${process.env.PUBLIC_URL}/assets/neobank-trademark.svg`}
           alt="NeoBank"
-          sx={{ width: 32, height: 32, mr: 1.5 }}
+          sx={{
+            width: 32,
+            height: 32,
+            mr: 1.5,
+          }}
         />
         <Typography
           variant="h6"
-          sx={{ fontSize: '1rem', fontWeight: 600, color: 'primary.main' }}
+          sx={{
+            fontSize: '1rem',
+            fontWeight: 600,
+            color: 'primary.main',
+          }}
         >
           NeoBank
         </Typography>
@@ -140,7 +146,7 @@ const SimpleViewPanel = () => {
         sx={{ mx: 2, borderColor: 'rgba(17, 182, 122, 0.2)' }}
       />
 
-      {/* Support Needs */}
+      {/* Support Needs - Condensed */}
       <Box sx={{ display: 'flex', alignItems: 'center', mr: 3 }}>
         <Support sx={{ color: 'primary.main', fontSize: '1.2rem', mr: 1 }} />
         <Box
@@ -161,10 +167,24 @@ const SimpleViewPanel = () => {
                 fontSize: '0.65rem',
                 backgroundColor: 'rgba(17, 182, 122, 0.1)',
                 color: 'primary.main',
-                '& .MuiChip-label': { px: 0.5 },
+                '& .MuiChip-label': {
+                  px: 0.5,
+                },
               }}
             />
           ))}
+          {consolidatedData.support.needs.length > 2 && (
+            <Typography
+              variant="caption"
+              sx={{
+                fontSize: '0.65rem',
+                color: 'text.secondary',
+                alignSelf: 'center',
+              }}
+            >
+              +{consolidatedData.support.needs.length - 2}
+            </Typography>
+          )}
         </Box>
       </Box>
 
@@ -174,7 +194,7 @@ const SimpleViewPanel = () => {
         sx={{ mx: 2, borderColor: 'rgba(17, 182, 122, 0.2)' }}
       />
 
-      {/* Status */}
+      {/* Status Section */}
       <Box sx={{ display: 'flex', alignItems: 'center', mr: 3 }}>
         <Security sx={{ color: 'primary.main', fontSize: '1.2rem', mr: 1 }} />
         <Box>
@@ -188,25 +208,34 @@ const SimpleViewPanel = () => {
           >
             Reason: {consolidatedData.ivr.callReason}
           </Typography>
-          <Chip
-            label={consolidatedData.customer.verified ? 'Verified' : 'Pending'}
-            size="small"
-            sx={{
-              height: '16px',
-              fontSize: '0.6rem',
-              backgroundColor: consolidatedData.customer.verified
-                ? 'rgba(56, 161, 105, 0.1)'
-                : 'rgba(255, 152, 0, 0.1)',
-              color: consolidatedData.customer.verified ? '#38a169' : '#e65100',
-              '& .MuiChip-label': { px: 0.5 },
-            }}
-          />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Chip
+              label={
+                consolidatedData.customer.verified ? 'Verified' : 'Pending'
+              }
+              size="small"
+              sx={{
+                height: '16px',
+                fontSize: '0.6rem',
+                backgroundColor: consolidatedData.customer.verified
+                  ? 'rgba(56, 161, 105, 0.1)'
+                  : 'rgba(255, 152, 0, 0.1)',
+                color: consolidatedData.customer.verified
+                  ? '#38a169'
+                  : '#e65100',
+                '& .MuiChip-label': {
+                  px: 0.5,
+                },
+              }}
+            />
+          </Box>
         </Box>
       </Box>
 
+      {/* Spacer to push actions to right */}
       <Box sx={{ flex: 1 }} />
 
-      {/* Status Indicator */}
+      {/* Quick Actions */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <Typography
           variant="caption"
@@ -222,104 +251,36 @@ const SimpleViewPanel = () => {
             backgroundColor: '#11b67a',
             animation: 'pulse 2s ease-in-out infinite',
             '@keyframes pulse': {
-              '0%, 100%': { opacity: 1, transform: 'scale(1)' },
-              '50%': { opacity: 0.7, transform: 'scale(1.2)' },
+              '0%, 100%': {
+                opacity: 1,
+                transform: 'scale(1)',
+              },
+              '50%': {
+                opacity: 0.7,
+                transform: 'scale(1.2)',
+              },
             },
           }}
         />
       </Box>
+
+      {/* Background decoration */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: `
+            radial-gradient(circle at 10% 50%, rgba(17, 182, 122, 0.02) 0%, transparent 40%),
+            radial-gradient(circle at 90% 50%, rgba(17, 182, 122, 0.02) 0%, transparent 40%)
+          `,
+          zIndex: 1,
+        }}
+      />
     </Paper>
   );
 };
 
-const MainLayout = () => {
-  const dispatch = useDispatch();
-  const { splashVisible } = useSelector((state) => state.app);
-  const [isSimpleView, setIsSimpleView] = useState(false);
-  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
-
-  const handleMoreFunctionClick = (action) => {
-    console.log('More functions clicked:', action);
-
-    if (action === 'switchView') {
-      setIsSimpleView(!isSimpleView);
-    }
-  };
-
-  useEffect(() => {
-    let timeoutId = null;
-
-    if (splashVisible) {
-      timeoutId = setTimeout(() => {
-        dispatch(setSplashVisible(false));
-      }, 3000);
-    }
-
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [dispatch, splashVisible]);
-
-  // Track when panels have loaded once
-  useEffect(() => {
-    if (!splashVisible && !hasLoadedOnce) {
-      const timer = setTimeout(() => {
-        setHasLoadedOnce(true);
-      }, 10000); // After all initial animations complete
-
-      return () => clearTimeout(timer);
-    }
-  }, [splashVisible, hasLoadedOnce]);
-
-  return (
-    <Box
-      sx={{
-        width: '100vw',
-        height: '100vh',
-        overflow: 'hidden',
-        position: 'relative',
-      }}
-    >
-      <SplashScreen />
-
-      <Fade in={!splashVisible} timeout={800}>
-        <Box
-          sx={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            visibility: splashVisible ? 'hidden' : 'visible',
-          }}
-        >
-          {/* Toggle between views - Keep SessionContextContainer mounted but hidden */}
-          <Box
-            sx={{
-              display: isSimpleView ? 'none' : 'block',
-              transition: 'all 0.3s ease-in-out',
-            }}
-          >
-            <SessionContextContainer skipAnimations={hasLoadedOnce} />
-          </Box>
-
-          {isSimpleView && <SimpleViewPanel />}
-
-          <Box
-            sx={{
-              flex: 1,
-              transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-            }}
-          >
-            <WorkingWindowArea isSimpleView={isSimpleView} />
-          </Box>
-        </Box>
-      </Fade>
-
-      <MoreFunctionButton onClick={handleMoreFunctionClick} />
-    </Box>
-  );
-};
-
-export default MainLayout;
+export default SimpleViewPanel;

@@ -6,26 +6,41 @@ import useTypingAnimation from '../../hooks/useTypingAnimation';
 import TypingIndicator from './TypingIndicator';
 import AiAssistantTag from './AiAssistantTag';
 
-const CustomerDetailsPanel = () => {
+const CustomerDetailsPanel = ({ skipAnimations = false }) => {
   const { stage, data } = useSelector((state) => state.customer);
   const { splashVisible } = useSelector((state) => state.app);
   const [showPanel, setShowPanel] = useState(false);
   const [showTyping, setShowTyping] = useState(false);
-  const [showCustomerDetails, setShowCustomerDetails] = useState(false);
-  const [showFinalView, setShowFinalView] = useState(false);
+  const [showCustomerDetails, setShowCustomerDetails] =
+    useState(skipAnimations);
+  const [showFinalView, setShowFinalView] = useState(skipAnimations);
 
   // Start CustomerDetailsPanel after IvrContextPanel completes
   useEffect(() => {
-    if (!splashVisible) {
-      const timer = setTimeout(() => {
-        setShowPanel(true);
-        // Start typing animation after panel appears
-        setTimeout(() => setShowTyping(true), 500);
-      }, 4500); // Start when IVR details should be in final view
+    let timeoutId = null;
 
-      return () => clearTimeout(timer);
+    if (!splashVisible) {
+      const delay = skipAnimations ? 200 : 4500;
+
+      timeoutId = setTimeout(() => {
+        setShowPanel(true);
+        if (skipAnimations) {
+          // Skip all animations and go straight to final view
+          setShowCustomerDetails(true);
+          setShowFinalView(true);
+        } else {
+          // First time - show typing animation
+          setTimeout(() => setShowTyping(true), 500);
+        }
+      }, delay);
     }
-  }, [splashVisible]);
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [splashVisible, skipAnimations]);
 
   const getCustomerDetails = () => {
     // Use sample data when no real data is available, or mix with real data
@@ -81,30 +96,43 @@ const CustomerDetailsPanel = () => {
 
   // Reset typing animation when stage changes
   useEffect(() => {
+    let timeoutId = null;
+
     if (showPanel) {
       setShowTyping(false);
       setShowFinalView(false);
-      const timer = setTimeout(() => setShowTyping(true), 300);
-      return () => clearTimeout(timer);
+      timeoutId = setTimeout(() => setShowTyping(true), 300);
     }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [stage, showPanel]);
 
   // Show customer details only after typing animation completes
   useEffect(() => {
+    let timeoutId = null;
+
     if (!isTypingMessage && showTyping) {
       // Small delay to ensure smooth transition
-      const timer = setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setShowCustomerDetails(true);
         // Switch to final view after customer details appear
         setTimeout(() => setShowFinalView(true), 1000);
       }, 800);
-
-      return () => clearTimeout(timer);
     } else if (isTypingMessage) {
       // Hide customer details when typing starts (for stage changes)
       setShowCustomerDetails(false);
       setShowFinalView(false);
     }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [isTypingMessage, showTyping]);
 
   return (
