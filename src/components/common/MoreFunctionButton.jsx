@@ -144,7 +144,8 @@ const MoreFunctionButton = ({ onClick }) => {
       delay: 300,
       onClick: () => {
         console.log('Switch View clicked');
-        setShowSatellites(false);
+        // Keep satellites visible when switching view
+        // setShowSatellites(false); // Removed this line
         if (onClick) onClick('switchView');
       },
     },

@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Fade, Paper, Typography, Chip, Divider } from '@mui/material';
+import {
+  Box,
+  Fade,
+  Paper,
+  Typography,
+  Chip,
+  Divider,
+  Grow,
+} from '@mui/material';
 import { Phone, Person, Support, Security } from '@mui/icons-material';
 import { setSplashVisible } from '../../store/slices/appSlice';
 import SplashScreen from '../common/SplashScreen';
@@ -9,7 +17,7 @@ import WorkingWindowArea from '../common/WorkingWindowArea';
 import MoreFunctionButton from '../common/MoreFunctionButton';
 
 // Safe SimpleViewPanel component
-const SimpleViewPanel = () => {
+const SimpleViewPanel = ({ onLogoClick, isMinimized }) => {
   const { stage, data } = useSelector((state) => state.customer);
   const { splashVisible } = useSelector((state) => state.app);
   const [showPanel, setShowPanel] = useState(false);
@@ -17,10 +25,12 @@ const SimpleViewPanel = () => {
   useEffect(() => {
     let timeoutId = null;
 
-    if (!splashVisible) {
+    if (!splashVisible && !isMinimized) {
       timeoutId = setTimeout(() => {
         setShowPanel(true);
       }, 300);
+    } else if (isMinimized) {
+      setShowPanel(false);
     }
 
     return () => {
@@ -28,7 +38,7 @@ const SimpleViewPanel = () => {
         clearTimeout(timeoutId);
       }
     };
-  }, [splashVisible]);
+  }, [splashVisible, isMinimized]);
 
   const consolidatedData = {
     ivr: {
@@ -54,35 +64,42 @@ const SimpleViewPanel = () => {
   return (
     <Paper
       sx={{
-        height: '60px',
+        height: isMinimized ? '0px' : '60px',
         display: 'flex',
         alignItems: 'center',
         background: 'linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)',
         borderRadius: 0,
-        borderBottom: '1px solid rgba(0,0,0,0.08)',
+        borderBottom: isMinimized ? 'none' : '1px solid rgba(0,0,0,0.08)',
         boxShadow: 'none',
         position: 'relative',
         overflow: 'hidden',
-        px: 6,
-        transform: showPanel ? 'translateY(0)' : 'translateY(-20px)',
-        opacity: showPanel ? 1 : 0,
+        px: isMinimized ? 0 : 6,
+        transform:
+          showPanel && !isMinimized ? 'translateY(0)' : 'translateY(-60px)',
+        opacity: showPanel && !isMinimized ? 1 : 0,
         transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
       }}
     >
-      {/* Brand Logo */}
-      <Box sx={{ display: 'flex', alignItems: 'center', mr: 4 }}>
+      {/* Brand Logo - Clickable to minimize/expand */}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          mr: 4,
+          cursor: 'pointer',
+          transition: 'transform 0.2s ease-in-out',
+          '&:hover': {
+            transform: 'scale(1.1)',
+          },
+        }}
+        onClick={onLogoClick}
+      >
         <Box
           component="img"
           src={`${process.env.PUBLIC_URL}/assets/neobank-trademark.svg`}
           alt="NeoBank"
-          sx={{ width: 32, height: 32, mr: 1.5 }}
+          sx={{ width: 32, height: 32 }}
         />
-        <Typography
-          variant="h6"
-          sx={{ fontSize: '1rem', fontWeight: 600, color: 'primary.main' }}
-        >
-          NeoBank
-        </Typography>
       </Box>
 
       {/* IVR Section */}
@@ -174,20 +191,10 @@ const SimpleViewPanel = () => {
         sx={{ mx: 2, borderColor: 'rgba(17, 182, 122, 0.2)' }}
       />
 
-      {/* Status */}
+      {/* Status - Removed "Reason: Change of Address", keeping only verification status */}
       <Box sx={{ display: 'flex', alignItems: 'center', mr: 3 }}>
         <Security sx={{ color: 'primary.main', fontSize: '1.2rem', mr: 1 }} />
         <Box>
-          <Typography
-            variant="caption"
-            sx={{
-              fontSize: '0.7rem',
-              color: 'text.secondary',
-              display: 'block',
-            }}
-          >
-            Reason: {consolidatedData.ivr.callReason}
-          </Typography>
           <Chip
             label={consolidatedData.customer.verified ? 'Verified' : 'Pending'}
             size="small"
@@ -232,18 +239,120 @@ const SimpleViewPanel = () => {
   );
 };
 
+// Floating Logo Component
+const FloatingLogo = ({ onClick, show }) => {
+  return (
+    <Grow in={show} timeout={600}>
+      <Paper
+        sx={{
+          position: 'fixed',
+          top: 20,
+          left: 20,
+          width: 56,
+          height: 56,
+          borderRadius: '50%',
+          background:
+            'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(250,250,250,0.98) 100%)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(17, 182, 122, 0.2)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          zIndex: 100,
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          '&:hover': {
+            transform: 'scale(1.1)',
+            boxShadow:
+              '0 12px 40px rgba(17, 182, 122, 0.25), 0 4px 12px rgba(0,0,0,0.1)',
+            border: '1px solid rgba(17, 182, 122, 0.3)',
+          },
+          '&:active': {
+            transform: 'scale(0.95)',
+          },
+          // Subtle floating animation
+          animation: 'floatAnimation 3s ease-in-out infinite',
+          '@keyframes floatAnimation': {
+            '0%, 100%': {
+              transform: 'translateY(0px)',
+            },
+            '50%': {
+              transform: 'translateY(-5px)',
+            },
+          },
+          '&:hover': {
+            animation: 'none',
+            transform: 'scale(1.1)',
+          },
+        }}
+        onClick={onClick}
+      >
+        <Box
+          component="img"
+          src={`${process.env.PUBLIC_URL}/assets/neobank-trademark.svg`}
+          alt="NeoBank"
+          sx={{
+            width: 36,
+            height: 36,
+            transition: 'transform 0.3s ease-in-out',
+          }}
+        />
+
+        {/* Pulse effect ring */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: -2,
+            left: -2,
+            right: -2,
+            bottom: -2,
+            borderRadius: '50%',
+            border: '2px solid rgba(17, 182, 122, 0.3)',
+            animation: 'pulseRing 2s ease-in-out infinite',
+            '@keyframes pulseRing': {
+              '0%': {
+                transform: 'scale(1)',
+                opacity: 1,
+              },
+              '50%': {
+                transform: 'scale(1.1)',
+                opacity: 0.5,
+              },
+              '100%': {
+                transform: 'scale(1)',
+                opacity: 1,
+              },
+            },
+          }}
+        />
+      </Paper>
+    </Grow>
+  );
+};
+
 const MainLayout = () => {
   const dispatch = useDispatch();
   const { splashVisible } = useSelector((state) => state.app);
   const [isSimpleView, setIsSimpleView] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const [isPanelMinimized, setIsPanelMinimized] = useState(false);
 
   const handleMoreFunctionClick = (action) => {
     console.log('More functions clicked:', action);
 
-    if (action === 'switchView') {
+    // Only allow view switching when panel is not minimized
+    if (action === 'switchView' && !isPanelMinimized) {
       setIsSimpleView(!isSimpleView);
+    } else if (action === 'switchView' && isPanelMinimized) {
+      console.log(
+        'Cannot switch view while panel is minimized. Please expand the panel first.'
+      );
     }
+  };
+
+  const handleLogoClick = () => {
+    setIsPanelMinimized(!isPanelMinimized);
   };
 
   useEffect(() => {
@@ -304,7 +413,18 @@ const MainLayout = () => {
             <SessionContextContainer skipAnimations={hasLoadedOnce} />
           </Box>
 
-          {isSimpleView && <SimpleViewPanel />}
+          {/* Simple View Panel - can be minimized */}
+          {isSimpleView && (
+            <SimpleViewPanel
+              onLogoClick={handleLogoClick}
+              isMinimized={isPanelMinimized}
+            />
+          )}
+
+          {/* Floating Logo - shows when panel is minimized */}
+          {isSimpleView && (
+            <FloatingLogo onClick={handleLogoClick} show={isPanelMinimized} />
+          )}
 
           <Box
             sx={{
@@ -312,7 +432,10 @@ const MainLayout = () => {
               transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           >
-            <WorkingWindowArea isSimpleView={isSimpleView} />
+            <WorkingWindowArea
+              isSimpleView={isSimpleView}
+              isFullHeight={isPanelMinimized}
+            />
           </Box>
         </Box>
       </Fade>
